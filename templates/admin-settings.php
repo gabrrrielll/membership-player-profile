@@ -1,0 +1,133 @@
+<?php
+/**
+ * Admin Settings Template
+ */
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+?>
+<div class="wrap profootball-admin-wrap">
+	<h1>ProFootball Player Profile Settings</h1>
+	
+	<form method="post" action="options.php">
+		<?php settings_fields( 'profootball_player_settings_group' ); ?>
+		
+		<div class="profootball-main-card">
+			<h2>Membership Permissions</h2>
+			<p>Select which membership levels can view the premium player profile details (CV, Video, Custom Sections).</p>
+			
+			<div class="profootball-membership-grid">
+				<?php if ( ! empty( $levels ) ) : ?>
+					<?php foreach ( $levels as $level ) : ?>
+						<label class="membership-item">
+							<input type="checkbox" name="profootball_allowed_memberships[]" value="<?php echo esc_attr( $level['id'] ); ?>" <?php checked( in_array( $level['id'], (array)$allowed_memberships ) ); ?>>
+							<span><?php echo esc_html( $level['label'] ); ?></span>
+						</label>
+					<?php endforeach; ?>
+				<?php else: ?>
+					<p class="notice notice-warning">No Indeed Membership Pro levels found. Make sure the plugin is active.</p>
+				<?php endif; ?>
+			</div>
+		</div>
+
+		<div class="profootball-main-card">
+			<h2>Dynamic Sections Configuration</h2>
+			<p>Define the sections that will appear on the player profile. You can map each field to an Ultimate Membership Pro (UMP) field slug.</p>
+			
+			<div id="profootball-sections-container" class="profootball-sections-list">
+				<?php if ( ! empty( $sections ) ) : ?>
+					<?php foreach ( $sections as $index => $section ) : ?>
+						<?php render_profootball_section_row( $index, $section ); ?>
+					<?php endforeach; ?>
+				<?php endif; ?>
+			</div>
+			
+			<div class="profootball-admin-actions">
+				<button type="button" id="add-new-section" class="button button-primary">Add New Section</button>
+			</div>
+		</div>
+
+		<?php submit_button( 'Save All Settings' ); ?>
+	</form>
+</div>
+
+<!-- Template for JS -->
+<script type="text/template" id="profootball-section-tpl">
+	<?php render_profootball_section_row( '{{INDEX}}', array() ); ?>
+</script>
+
+<?php
+/**
+ * Helper to render a section row
+ */
+function render_profootball_section_row( $index, $data ) {
+	$title = isset( $data['title'] ) ? $data['title'] : '';
+	$fields = isset( $data['fields'] ) ? $data['fields'] : array();
+	?>
+	<div class="profootball-section-item" data-index="<?php echo $index; ?>">
+		<div class="section-header">
+			<span class="dashicons dashicons-move handle"></span>
+			<input type="text" name="profootball_player_sections[<?php echo $index; ?>][title]" value="<?php echo esc_attr( $title ); ?>" placeholder="Section Title (e.g. Player CV)" class="section-title-input">
+			<button type="button" class="remove-section button-link-delete">Remove Section</button>
+		</div>
+		
+		<div class="section-fields-container">
+			<!-- Fields inside this section -->
+			<table class="widefat field-table">
+				<thead>
+					<tr>
+						<th>Field Label</th>
+						<th>Field Type</th>
+						<th>UMP Mapping (Slug)</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				<tbody class="fields-list">
+					<?php if ( ! empty( $fields ) ) : ?>
+						<?php foreach ( $fields as $f_index => $field ) : ?>
+							<?php render_profootball_field_row( $index, $f_index, $field ); ?>
+						<?php endforeach; ?>
+					<?php endif; ?>
+				</tbody>
+			</table>
+			<div class="add-field-wrap">
+				<button type="button" class="add-new-field button">Add Field to Section</button>
+			</div>
+		</div>
+	</div>
+	<?php
+}
+
+function render_profootball_field_row( $s_index, $f_index, $field ) {
+	$label = isset( $field['label'] ) ? $field['label'] : '';
+	$type = isset( $field['type'] ) ? $field['type'] : 'text';
+	$mapping = isset( $field['mapping'] ) ? $field['mapping'] : '';
+	?>
+	<tr>
+		<td>
+			<input type="text" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][label]" value="<?php echo esc_attr( $label ); ?>" placeholder="Label">
+		</td>
+		<td>
+			<select name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][type]">
+				<option value="text" <?php selected( $type, 'text' ); ?>>Input Text</option>
+				<option value="textarea" <?php selected( $type, 'textarea' ); ?>>Textarea / Editor</option>
+				<option value="select" <?php selected( $type, 'select' ); ?>>Select (Dropdown)</option>
+				<option value="image" <?php selected( $type, 'image' ); ?>>Single Image / Graphic</option>
+				<option value="gallery" <?php selected( $type, 'gallery' ); ?>>Gallery Slider</option>
+				<option value="video" <?php selected( $type, 'video' ); ?>>Video Link Preview</option>
+				<option value="file" <?php selected( $type, 'file' ); ?>>File Download (CV)</option>
+			</select>
+		</td>
+		<td>
+			<input type="text" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][mapping]" value="<?php echo esc_attr( $mapping ); ?>" placeholder="ump_field_slug">
+		</td>
+		<td>
+			<button type="button" class="remove-field button-link-delete">Remove</button>
+		</td>
+	</tr>
+	<?php
+}
+?>
+<script type="text/template" id="profootball-field-tpl">
+	<?php render_profootball_field_row( '{{S_INDEX}}', '{{F_INDEX}}', array() ); ?>
+</script>

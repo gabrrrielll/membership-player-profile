@@ -1,0 +1,233 @@
+/* Main Player Profile Styles */
+.profootball-profile-container {
+    background: #111;
+    color: #fff;
+    font-family: 'Outfit', sans-serif;
+    padding: 40px 20px;
+    border-radius: 12px;
+}
+
+/* Header Section */
+.profootball-header-card {
+    background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+    padding: 30px;
+    border-radius: 12px;
+    margin-bottom: 40px;
+    border: 1px solid #333;
+}
+
+.profootball-header-flex {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+}
+
+.profootball-main-photo img,
+.photo-placeholder {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 4px solid #d4af37;
+    background: #222;
+}
+
+.photo-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 50px;
+    color: #444;
+}
+
+.player-full-name {
+    font-size: 3em;
+    font-weight: 900;
+    margin: 0;
+    text-transform: uppercase;
+    color: #fff;
+}
+
+.player-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin: 10px 0 20px;
+}
+
+.squad-number {
+    background: #d4af37;
+    color: #000;
+    font-weight: 900;
+    padding: 5px 15px;
+    border-radius: 4px;
+    font-size: 1.2em;
+}
+
+.player-nationality {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 1.1em;
+}
+
+.country-flag {
+    width: 30px;
+    height: auto;
+    border: 1px solid #444;
+}
+
+.profootball-anchor-nav-inline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.profootball-anchor-button.mini {
+    min-width: unset;
+    padding: 8px 15px;
+    font-size: 0.8em;
+}
+
+/* Navigation Buttons (Anchor links) */
+.profootball-anchor-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 40px;
+}
+
+.profootball-anchor-button {
+    background: #d4af37;
+    /* Gold */
+    color: #000;
+    padding: 12px 20px;
+    text-decoration: none;
+    font-weight: 800;
+    text-transform: uppercase;
+    text-align: center;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    display: inline-block;
+    width: fit-content;
+    min-width: 200px;
+}
+
+.profootball-anchor-button:hover {
+    background: #fff;
+    transform: translateX(10px);
+}
+
+/* Section Styling */
+.profootball-dynamic-section {
+    margin-bottom: 60px;
+    border-top: 1px solid #333;
+    padding-top: 40px;
+}
+
+.section-title-wrap {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.central-title {
+    font-size: 2.5em;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #d4af37;
+    margin: 0;
+}
+
+.profootball-field-item {
+    margin-bottom: 30px;
+}
+
+.field-label {
+    font-size: 0.9em;
+    color: #888;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.field-content {
+    font-size: 1.2em;
+    color: #eee;
+}
+
+/* Gallery Slider */
+.profootball-gallery-slider {
+    position: relative;
+    overflow: hidden;
+    margin-top: 20px;
+}
+
+.slider-wrapper {
+    display: flex;
+    transition: transform 0.5s ease;
+}
+
+.slider-item {
+    min-width: 100%;
+}
+
+.slider-item img {
+    width: 100%;
+    border-radius: 8px;
+}
+
+.slider-nav {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.slider-prev,
+.slider-next {
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    border: none;
+    padding: 15px;
+    cursor: pointer;
+    pointer-events: auto;
+    font-size: 20px;
+}
+
+/* Locked Content */
+.profootball-locked-notice {
+    background: rgba(212, 175, 55, 0.1);
+    border: 2px dashed #d4af37;
+    padding: 40px;
+    text-align: center;
+    border-radius: 12px;
+}
+
+.profootball-locked-notice h3 {
+    margin: 0 0 10px;
+    color: #d4af37;
+}
+
+.profootball-download-link {
+    display: inline-block;
+    background: #333;
+    color: #d4af37;
+    padding: 15px 25px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 700;
+    border: 1px solid #d4af37;
+    transition: all 0.3s;
+}
+
+.profootball-download-link:hover {
+    background: #d4af37;
+    color: #000;
+}

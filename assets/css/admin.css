@@ -1,0 +1,119 @@
+.profootball-admin-wrap {
+	max-width: 1000px;
+	margin-top: 20px;
+}
+
+.profootball-main-card {
+	background: #fff;
+	border-radius: 8px;
+	padding: 20px;
+	margin-bottom: 20px;
+	box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+	border: 1px solid #e2e8f0;
+}
+
+.profootball-main-card h2 {
+	margin-top: 0;
+	border-bottom: 2px solid #f1f5f9;
+	padding-bottom: 10px;
+	color: #1e293b;
+}
+
+.profootball-membership-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+	gap: 10px;
+	margin-top: 15px;
+}
+
+.membership-item {
+	display: flex;
+	align-items: center;
+	background: #f8fafc;
+	padding: 10px;
+	border-radius: 6px;
+	border: 1px solid #cbd5e1;
+	cursor: pointer;
+	transition: all 0.2s;
+}
+
+.membership-item:hover {
+	border-color: #2271b1;
+	background: #f1f5f9;
+}
+
+.membership-item input {
+	margin-right: 10px;
+}
+
+.profootball-section-item {
+	background: #fff;
+	border: 1px solid #cbd5e1;
+	border-radius: 6px;
+	margin-bottom: 15px;
+	overflow: hidden;
+}
+
+.section-header {
+	background: #f1f5f9;
+	padding: 10px 15px;
+	display: flex;
+	align-items: center;
+	border-bottom: 1px solid #cbd5e1;
+}
+
+.section-header .handle {
+	cursor: move;
+	margin-right: 10px;
+	color: #64748b;
+}
+
+.section-title-input {
+	flex-grow: 1;
+	font-weight: 600;
+	font-size: 1.1em !important;
+	border: none !important;
+	background: transparent !important;
+	box-shadow: none !important;
+}
+
+.section-title-input:focus {
+	background: #fff !important;
+	border: 1px solid #2271b1 !important;
+}
+
+.section-fields-container {
+	padding: 15px;
+}
+
+.field-table th {
+	text-align: left;
+	font-weight: 600;
+	color: #64748b;
+}
+
+.field-table td input, 
+.field-table td select {
+	width: 100%;
+}
+
+.add-field-wrap {
+	margin-top: 10px;
+	text-align: right;
+}
+
+.profootball-admin-actions {
+	margin-top: 20px;
+	border-top: 1px solid #f1f5f9;
+	padding-top: 20px;
+}
+
+.remove-section {
+	color: #ef4444 !important;
+	text-decoration: none;
+	font-size: 0.9em;
+}
+
+.remove-section:hover {
+	color: #dc2626 !important;
+}
