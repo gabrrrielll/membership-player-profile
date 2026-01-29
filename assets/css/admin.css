@@ -8,7 +8,7 @@
 	border-radius: 8px;
 	padding: 20px;
 	margin-bottom: 20px;
-	box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 	border: 1px solid #e2e8f0;
 }
 
@@ -92,7 +92,7 @@
 	color: #64748b;
 }
 
-.field-table td input, 
+.field-table td input,
 .field-table td select {
 	width: 100%;
 }
@@ -116,4 +116,18 @@
 
 .remove-section:hover {
 	color: #dc2626 !important;
+}
+
+.profootball-help-icon {
+	display: inline-block;
+	color: #2271b1;
+	cursor: help;
+	margin-left: 5px;
+	vertical-align: middle;
+}
+
+.profootball-help-icon .dashicons {
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
 }

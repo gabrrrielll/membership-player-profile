@@ -78,7 +78,12 @@ function render_profootball_section_row( $index, $data ) {
 					<tr>
 						<th>Field Label</th>
 						<th>Field Type</th>
-						<th>UMP Mapping (Slug)</th>
+						<th>
+							UMP Mapping (Slug)
+							<span class="profootball-help-icon" title="Aici trebuie să introduci 'Slug-ul' (numele tehnic) al câmpului din Ultimate Membership Pro (UMP). Exemplu: dacă în UMP ai creat un câmp pentru înălțime cu slug-ul 'player_height', scrie aici 'player_height'. Datele completate de jucător în acel câmp vor apărea automat în această secțiune a profilului.">
+								<span class="dashicons dashicons-editor-help"></span>
+							</span>
+						</th>
 						<th>Action</th>
 					</tr>
 				</thead>
