@@ -25,8 +25,9 @@ class ProFootball_Player_Profile {
 		// Initialize Admin
 		new ProFootball_Admin();
 
-		// Enqueue Scripts & Styles
-		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_public_assets' ) );
+		// Enqueue Inline Styles & Scripts
+		add_action( 'wp_head', array( $this, 'inline_frontend_css' ) );
+		add_action( 'wp_footer', array( $this, 'inline_frontend_js' ) );
 
 		// Hook after UMP registration
 		add_action( 'ihc_action_after_register_process', array( $this, 'link_member_to_player' ), 10, 1 );
@@ -47,11 +48,20 @@ class ProFootball_Player_Profile {
 		return $links;
 	}
 
-	public function enqueue_public_assets() {
+	public function inline_frontend_css() {
 		if ( ! is_singular( 'sp_player' ) ) return;
+		$css_path = PROFOOTBALL_PLAYER_PROFILE_PATH . 'assets/css/style.css';
+		if ( file_exists( $css_path ) ) {
+			echo '<style type="text/css">' . file_get_contents( $css_path ) . '</style>';
+		}
+	}
 
-		wp_enqueue_style( 'profootball-player-style', PROFOOTBALL_PLAYER_PROFILE_URL . 'assets/css/style.css', array(), '1.0.0' );
-		wp_enqueue_script( 'profootball-player-scripts', PROFOOTBALL_PLAYER_PROFILE_URL . 'assets/js/scripts.js', array( 'jquery' ), '1.0.0', true );
+	public function inline_frontend_js() {
+		if ( ! is_singular( 'sp_player' ) ) return;
+		$js_path = PROFOOTBALL_PLAYER_PROFILE_PATH . 'assets/js/scripts.js';
+		if ( file_exists( $js_path ) ) {
+			echo '<script type="text/javascript">' . file_get_contents( $js_path ) . '</script>';
+		}
 	}
 
 	/**
