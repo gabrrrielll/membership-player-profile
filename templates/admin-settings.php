@@ -104,6 +104,7 @@ function render_profootball_section_row( $index, $data ) {
 }
 
 function render_profootball_field_row( $s_index, $f_index, $field ) {
+	global $ump_fields;
 	$label = isset( $field['label'] ) ? $field['label'] : '';
 	$type = isset( $field['type'] ) ? $field['type'] : 'text';
 	$mapping = isset( $field['mapping'] ) ? $field['mapping'] : '';
@@ -124,7 +125,19 @@ function render_profootball_field_row( $s_index, $f_index, $field ) {
 			</select>
 		</td>
 		<td>
-			<input type="text" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][mapping]" value="<?php echo esc_attr( $mapping ); ?>" placeholder="ump_field_slug">
+			<select name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][mapping]" class="ump-mapping-select">
+				<option value="">-- Select UMP Field --</option>
+				<?php if ( ! empty( $ump_fields ) ) : ?>
+					<?php foreach ( $ump_fields as $u_field ) : 
+						if ( empty( $u_field['name'] ) ) continue;
+						$f_label = ! empty( $u_field['label'] ) ? $u_field['label'] : $u_field['name'];
+						?>
+						<option value="<?php echo esc_attr( $u_field['name'] ); ?>" <?php selected( $mapping, $u_field['name'] ); ?>>
+							<?php echo esc_html( $f_label . ' (' . $u_field['name'] . ')' ); ?>
+						</option>
+					<?php endforeach; ?>
+				<?php endif; ?>
+			</select>
 		</td>
 		<td>
 			<button type="button" class="remove-field button-link-delete">Remove</button>

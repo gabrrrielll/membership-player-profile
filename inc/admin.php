@@ -70,6 +70,12 @@ class ProFootball_Admin {
 			$levels = \Indeed\Ihc\Db\Memberships::getAll();
 		}
 
+		// Fetch UMP Registration Fields for mapping
+		$ump_fields = array();
+		if ( function_exists( 'ihc_get_user_reg_fields' ) ) {
+			$ump_fields = ihc_get_user_reg_fields();
+		}
+
 		$sections = get_option( 'profootball_player_sections', array() );
 		$allowed_memberships = get_option( 'profootball_allowed_memberships', array() );
 
