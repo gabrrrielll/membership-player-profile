@@ -40,12 +40,101 @@ class ProFootball_Player_Profile {
 
 		// Plugin Action Links
 		add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'add_settings_link' ) );
+
+		// UMP Account Page Custom Tab
+		add_filter( 'ihc_account_page_menu_filter', array( $this, 'add_ump_account_tab' ), 10, 1 );
+		add_filter( 'ihc_account_page_content_filter', array( $this, 'add_ump_account_tab_content' ), 10, 2 );
+		
+		// Handle Profile Save
+		add_action( 'init', array( $this, 'handle_player_profile_save' ) );
 	}
 
 	public function add_settings_link( $links ) {
 		$settings_link = '<a href="' . admin_url( 'admin.php?page=profootball-player-profile' ) . '">Settings</a>';
 		array_unshift( $links, $settings_link );
 		return $links;
+	}
+
+	/**
+	 * Add "Player Details" tab to UMP My Account page
+	 */
+	public function add_ump_account_tab( $menu_items ) {
+		$menu_items['player_details'] = array(
+			'title' => 'Player Details',
+			'icon'  => 'fa-user-circle',
+		);
+		return $menu_items;
+	}
+
+	/**
+	 * Render content for "Player Details" tab
+	 */
+	public function add_ump_account_tab_content( $content, $tab ) {
+		if ( $tab === 'player_details' ) {
+			ob_start();
+			$this->get_template( 'account-player-form.php', array( 'user_id' => get_current_user_id() ) );
+			return ob_get_clean();
+		}
+		return $content;
+	}
+
+	/**
+	 * Handle the saving of dynamic fields from the account page
+	 */
+	public function handle_player_profile_save() {
+		if ( ! isset( $_POST['profootball_save_profile'] ) || ! wp_verify_nonce( $_POST['profootball_profile_nonce'], 'profootball_save_action' ) ) {
+			return;
+		}
+
+		$user_id = get_current_user_id();
+		if ( ! $user_id ) return;
+
+		$sections = get_option( 'profootball_player_sections', array() );
+		if ( empty( $sections ) ) return;
+
+		foreach ( $sections as $section ) {
+			if ( empty( $section['fields'] ) ) continue;
+
+			foreach ( $section['fields'] as $field ) {
+				$mapping = ! empty( $field['mapping'] ) ? $field['mapping'] : '';
+				if ( empty( $mapping ) ) continue;
+
+				if ( $field['type'] === 'file' || $field['type'] === 'image' || $field['type'] === 'gallery' ) {
+					// Handling file uploads would require more logic, 
+					// for now we assume they use the UMP file fields if available or IDs
+					if ( isset( $_POST[ $mapping ] ) ) {
+						update_user_meta( $user_id, $mapping, sanitize_text_field( $_POST[ $mapping ] ) );
+					}
+				} else {
+					if ( isset( $_POST[ $mapping ] ) ) {
+						update_user_meta( $user_id, $mapping, wp_kses_post( $_POST[ $mapping ] ) );
+					}
+				}
+			}
+		}
+
+		// Update linked SportsPress Player if exists (Nationality etc)
+		$nationality = get_user_meta( $user_id, 'nationality', true );
+		if ( $nationality ) {
+			$player_id = $this->get_player_id_by_user( $user_id );
+			if ( $player_id ) {
+				update_post_meta( $player_id, 'sp_nationality', $nationality );
+			}
+		}
+
+		wp_redirect( add_query_arg( 'profootball_save', 'success' ) );
+		exit;
+	}
+
+	private function get_player_id_by_user( $user_id ) {
+		$posts = get_posts( array(
+			'post_type'  => 'sp_player',
+			'meta_key'   => '_sp_user_id',
+			'meta_value' => $user_id,
+			'posts_per_page' => 1,
+			'fields'     => 'ids'
+		) );
+		return ! empty( $posts ) ? $posts[0] : false;
 	}
 
 	public function inline_frontend_css() {
