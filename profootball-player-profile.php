@@ -42,8 +42,10 @@ class ProFootball_Player_Profile {
 		add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'add_settings_link' ) );
 
 		// UMP Account Page Custom Tab
-		add_filter( 'ihc_account_page_menu_filter', array( $this, 'add_ump_account_tab' ), 10, 1 );
-		add_filter( 'ihc_account_page_content_filter', array( $this, 'add_ump_account_tab_content' ), 10, 2 );
+		add_filter( 'option_ihc_ap_tabs', array( $this, 'add_tab_to_enabled_list' ) );
+		add_filter( 'ihc_public_account_page_menu_standard_tabs', array( $this, 'add_ump_account_tab' ), 10, 1 );
+		add_filter( 'ihc_filter_custom_menu_items', array( $this, 'add_ump_account_tab' ), 10, 1 );
+		add_filter( 'ihc_account_page_custom_tab_content', array( $this, 'add_ump_account_tab_content' ), 10, 2 );
 		
 		// Handle Profile Save
 		add_action( 'init', array( $this, 'handle_player_profile_save' ) );
@@ -56,13 +58,36 @@ class ProFootball_Player_Profile {
 	}
 
 	/**
+	 * Force UMP to recognize our tab as "enabled"
+	 */
+	public function add_tab_to_enabled_list( $tabs ) {
+		if ( empty( $tabs ) ) return 'player_details';
+		$list = is_string( $tabs ) ? explode( ',', $tabs ) : (array)$tabs;
+		if ( ! in_array( 'player_details', $list ) ) {
+			$list[] = 'player_details';
+		}
+		return is_string( $tabs ) ? implode( ',', $list ) : $list;
+	}
+
+	/**
 	 * Add "Player Details" tab to UMP My Account page
 	 */
 	public function add_ump_account_tab( $menu_items ) {
+		// Ensure we have an array
+		if ( ! is_array( $menu_items ) ) {
+			$menu_items = array();
+		}
+
+		$account_page_id = get_option( 'ihc_general_user_page' );
+		$base_url = get_permalink( $account_page_id );
+
 		$menu_items['player_details'] = array(
 			'title' => 'Player Details',
-			'icon'  => 'fa-user-circle',
+			'url'   => add_query_arg( 'ihc_ap_menu', 'player_details', $base_url ),
+			'class' => 'ihc-ap-menu-item',
+			'icon'  => 'f2bd', // FontAwesome code for user-circle
 		);
+
 		return $menu_items;
 	}
 
