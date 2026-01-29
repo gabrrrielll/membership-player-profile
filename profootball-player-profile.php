@@ -68,8 +68,36 @@ class ProFootball_Player_Profile {
 	 * Automatically create or link a SportsPress Player when a new member registers
 	 */
 	public function link_member_to_player( $user_id ) {
-		// Logic to check if user should have a player profile
-		// We'll implement this later
+		$user = get_userdata( $user_id );
+		if ( ! $user ) return;
+
+		// Check if player already exists
+		$existing = new WP_Query( array(
+			'post_type'  => 'sp_player',
+			'meta_key'   => '_sp_user_id',
+			'meta_value' => $user_id,
+			'posts_per_page' => 1
+		) );
+
+		if ( $existing->have_posts() ) return;
+
+		// Create a new Player post
+		$player_id = wp_insert_post( array(
+			'post_title'   => $user->display_name,
+			'post_type'    => 'sp_player',
+			'post_status'  => 'publish', // Or 'draft' depending on workflow
+			'post_author'  => $user_id,
+		) );
+
+		if ( ! is_wp_error( $player_id ) ) {
+			update_post_meta( $player_id, '_sp_user_id', $user_id );
+			
+			// Optional: mapping standard SP nationality if UMP field exists
+			$nationality = get_user_meta( $user_id, 'nationality', true );
+			if ( $nationality ) {
+				update_post_meta( $player_id, 'sp_nationality', $nationality );
+			}
+		}
 	}
 
 	/**
