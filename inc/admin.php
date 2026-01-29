@@ -64,6 +64,8 @@ class ProFootball_Admin {
 	}
 
 	public function render_settings_page() {
+		global $ump_fields;
+		
 		// Fetch existing levels from UMP if possible
 		$levels = array();
 		if ( class_exists( 'Indeed\Ihc\Db\Memberships' ) ) {

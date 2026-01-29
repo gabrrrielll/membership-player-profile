@@ -83,6 +83,7 @@ class ProFootball_Player_Profile {
 
 		$menu_items['player_details'] = array(
 			'title' => 'Player Details',
+			'label' => 'Player Details',
 			'url'   => add_query_arg( 'ihc_ap_menu', 'player_details', $base_url ),
 			'class' => 'ihc-ap-menu-item',
 			'icon'  => 'f2bd', // FontAwesome code for user-circle
@@ -124,9 +125,7 @@ class ProFootball_Player_Profile {
 				$mapping = ! empty( $field['mapping'] ) ? $field['mapping'] : '';
 				if ( empty( $mapping ) ) continue;
 
-				if ( $field['type'] === 'file' || $field['type'] === 'image' || $field['type'] === 'gallery' ) {
-					// Handling file uploads would require more logic, 
-					// for now we assume they use the UMP file fields if available or IDs
+				if ( $field['type'] === 'file' || $field['type'] === 'image' || $field['type'] === 'gallery' || $field['type'] === 'video' ) {
 					if ( isset( $_POST[ $mapping ] ) ) {
 						update_user_meta( $user_id, $mapping, sanitize_text_field( $_POST[ $mapping ] ) );
 					}
@@ -163,15 +162,23 @@ class ProFootball_Player_Profile {
 	}
 
 	public function inline_frontend_css() {
-		if ( ! is_singular( 'sp_player' ) ) return;
+		$account_page_id = get_option( 'ihc_general_user_page' );
+		if ( ! is_singular( 'sp_player' ) && ! is_page( $account_page_id ) ) return;
+
 		$css_path = PROFOOTBALL_PLAYER_PROFILE_PATH . 'assets/css/style.css';
+		echo '<style type="text/css">';
 		if ( file_exists( $css_path ) ) {
-			echo '<style type="text/css">' . file_get_contents( $css_path ) . '</style>';
+			echo file_get_contents( $css_path );
 		}
+		// Force Icon for Player Details Tab
+		echo '.fa-player_details-account-ihc:before { content: "\\f2bd" !important; font-family: "FontAwesome" !important; }';
+		echo '</style>';
 	}
 
 	public function inline_frontend_js() {
-		if ( ! is_singular( 'sp_player' ) ) return;
+		$account_page_id = get_option( 'ihc_general_user_page' );
+		if ( ! is_singular( 'sp_player' ) && ! is_page( $account_page_id ) ) return;
+
 		$js_path = PROFOOTBALL_PLAYER_PROFILE_PATH . 'assets/js/scripts.js';
 		if ( file_exists( $js_path ) ) {
 			echo '<script type="text/javascript">' . file_get_contents( $js_path ) . '</script>';
