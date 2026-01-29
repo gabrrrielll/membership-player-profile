@@ -1,6 +1,7 @@
 /* .gitignore */
 temp_plugins/
 temp_themes/
+implementation_plan.md
 *.zip
 *.pdf
 .DS_Store
