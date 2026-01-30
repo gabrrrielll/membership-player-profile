@@ -29,8 +29,9 @@ class ProFootball_Player_Profile {
 		add_action( 'wp_head', array( $this, 'inline_frontend_css' ) );
 		add_action( 'wp_footer', array( $this, 'inline_frontend_js' ) );
 
-		// Hook after UMP registration
+		// Hook after UMP registration or subscription activation
 		add_action( 'ihc_action_after_register_process', array( $this, 'link_member_to_player' ), 10, 1 );
+		add_action( 'ihc_action_after_subscription_activated', array( $this, 'link_member_to_player' ), 10, 2 );
 
 		// Custom Shortcode for Player Profile
 		add_shortcode( 'profootball_player_profile', array( $this, 'render_player_profile' ) );
@@ -253,27 +254,45 @@ class ProFootball_Player_Profile {
 	}
 
 	/**
-	 * Automatically create or link a SportsPress Player when a new member registers
+	 * Automatically create or link a SportsPress Player when a member gets an allowed membership
 	 */
-	public function link_member_to_player( $user_id ) {
+	public function link_member_to_player( $user_id, $lid = null ) {
 		$user = get_userdata( $user_id );
 		if ( ! $user ) return;
 
-		// Check if player already exists
-		$existing = new WP_Query( array(
-			'post_type'  => 'sp_player',
-			'meta_key'   => '_sp_user_id',
-			'meta_value' => $user_id,
-			'posts_per_page' => 1
-		) );
+		// Get allowed memberships for sync
+		$sync_memberships = get_option( 'profootball_sync_memberships', array() );
+		if ( empty( $sync_memberships ) ) return;
 
-		if ( $existing->have_posts() ) return;
+		// If lid is not provided (registration hook), check all user levels
+		if ( $lid === null ) {
+			if ( function_exists( 'ihc_get_user_levels' ) ) {
+				$user_levels = ihc_get_user_levels( $user_id, true );
+				$has_allowed = false;
+				foreach ( $sync_memberships as $allowed ) {
+					if ( in_array( $allowed, $user_levels ) ) {
+						$has_allowed = true;
+						break;
+					}
+				}
+				if ( ! $has_allowed ) return;
+			} else {
+				return; // Cannot check levels
+			}
+		} else {
+			// Activated subscription hook - check if THIS lid is in our sync list
+			if ( ! in_array( $lid, $sync_memberships ) ) return;
+		}
+
+		// Check if player already exists
+		$player_id = $this->get_player_id_by_user( $user_id );
+		if ( $player_id ) return;
 
 		// Create a new Player post
 		$player_id = wp_insert_post( array(
 			'post_title'   => $user->display_name,
 			'post_type'    => 'sp_player',
-			'post_status'  => 'publish', // Or 'draft' depending on workflow
+			'post_status'  => 'publish',
 			'post_author'  => $user_id,
 		) );
 

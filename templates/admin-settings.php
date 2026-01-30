@@ -24,6 +24,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 							<span><?php echo esc_html( $level['label'] ); ?></span>
 						</label>
 					<?php endforeach; ?>
+				<?php endif; ?>
+			</div>
+		</div>
+
+		<div class="profootball-main-card">
+			<h2>Automatic Player Profile Creation</h2>
+			<p>Select which membership levels should automatically have a SportsPress <strong>sp_player</strong> post created or linked upon registration/purchase.</p>
+			
+			<div class="profootball-membership-grid">
+				<?php if ( ! empty( $levels ) ) : ?>
+					<?php foreach ( $levels as $level ) : ?>
+						<label class="membership-item">
+							<input type="checkbox" name="profootball_sync_memberships[]" value="<?php echo esc_attr( $level['id'] ); ?>" <?php checked( in_array( $level['id'], (array)$sync_memberships ) ); ?>>
+							<span style="color: #d4af37; font-weight: bold;"><?php echo esc_html( $level['label'] ); ?></span>
+						</label>
+					<?php endforeach; ?>
 				<?php else: ?>
 					<p class="notice notice-warning">No Indeed Membership Pro levels found. Make sure the plugin is active.</p>
 				<?php endif; ?>
@@ -104,7 +120,7 @@ function render_profootball_section_row( $index, $data ) {
 }
 
 function render_profootball_field_row( $s_index, $f_index, $field ) {
-	global $ump_fields;
+	global $ump_fields, $sp_fields;
 	$label = isset( $field['label'] ) ? $field['label'] : '';
 	$type = isset( $field['type'] ) ? $field['type'] : 'text';
 	$mapping = isset( $field['mapping'] ) ? $field['mapping'] : '';
@@ -142,8 +158,8 @@ function render_profootball_field_row( $s_index, $f_index, $field ) {
 				</optgroup>
 
 				<optgroup label="SportsPress Attributes">
-					<?php if ( ! empty( $GLOBALS['sp_fields'] ) ) : ?>
-						<?php foreach ( $GLOBALS['sp_fields'] as $sp_f ) : ?>
+					<?php if ( ! empty( $sp_fields ) ) : ?>
+						<?php foreach ( $sp_fields as $sp_f ) : ?>
 							<option value="<?php echo esc_attr( $sp_f['name'] ); ?>" <?php selected( $mapping, $sp_f['name'] ); ?>>
 								<?php echo esc_html( $sp_f['label'] ); ?>
 							</option>

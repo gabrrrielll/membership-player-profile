@@ -31,6 +31,7 @@ class ProFootball_Admin {
 	public function register_settings() {
 		register_setting( 'profootball_player_settings_group', 'profootball_player_sections' );
 		register_setting( 'profootball_player_settings_group', 'profootball_allowed_memberships' );
+		register_setting( 'profootball_player_settings_group', 'profootball_sync_memberships' );
 	}
 
 	public function inline_admin_css() {
@@ -64,7 +65,7 @@ class ProFootball_Admin {
 	}
 
 	public function render_settings_page() {
-		global $ump_fields;
+		global $ump_fields, $sp_fields;
 		
 		// Fetch existing levels from UMP if possible
 		$levels = array();
@@ -94,6 +95,7 @@ class ProFootball_Admin {
 
 		$sections = get_option( 'profootball_player_sections', array() );
 		$allowed_memberships = get_option( 'profootball_allowed_memberships', array() );
+		$sync_memberships = get_option( 'profootball_sync_memberships', array() );
 
 		include PROFOOTBALL_PLAYER_PROFILE_PATH . 'templates/admin-settings.php';
 	}
