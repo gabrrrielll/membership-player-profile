@@ -74,8 +74,17 @@ if ( empty( $sections ) ) {
 								<p class="field-desc">Paste the link to your video (YouTube, Vimeo, etc.).</p>
 
 							<?php elseif ( $field['type'] === 'file' || $field['type'] === 'image' ) : ?>
-								<input type="text" name="<?php echo esc_attr( $mapping ); ?>" value="<?php echo esc_attr( $value ); ?>" placeholder="File/Image ID or URL">
-								<p class="field-desc">Use UMP Profile Details tab to upload files if needed, then paste the ID here.</p>
+								<div class="profootball-upload-container">
+									<input type="file" name="<?php echo esc_attr( $mapping ); ?>" class="profootball-file-input">
+									<?php if ( $value ) : 
+										$file_display = is_numeric($value) ? basename(wp_get_attachment_url($value)) : basename($value);
+										?>
+										<p class="current-file">
+											Current: <a href="<?php echo esc_url(is_numeric($value) ? wp_get_attachment_url($value) : $value); ?>" target="_blank"><strong><?php echo esc_html($file_display); ?></strong></a>
+										</p>
+									<?php endif; ?>
+								</div>
+								<p class="field-desc">Upload your <?php echo esc_html(strtolower($field['label'])); ?> directly from your device.</p>
 							
 							<?php else : ?>
 								<input type="text" name="<?php echo esc_attr( $mapping ); ?>" value="<?php echo esc_attr( $value ); ?>">
@@ -143,5 +152,30 @@ if ( empty( $sections ) ) {
 .profootball-form-field select option:checked {
 	background: #d4af37 content-box;
 	color: #fff;
+}
+.profootball-upload-container {
+	background: #fff;
+	border: 1px dashed #ccc;
+	padding: 15px;
+	border-radius: 4px;
+	text-align: center;
+}
+.profootball-file-input {
+	margin-bottom: 10px;
+}
+.current-file {
+	margin: 10px 0 0;
+	padding: 8px;
+	background: #e9f7ef;
+	border: 1px solid #d4efdf;
+	border-radius: 4px;
+	font-size: 0.9em;
+}
+.current-file a {
+	color: #27ae60;
+	text-decoration: none;
+}
+.current-file a:hover {
+	text-decoration: underline;
 }
 </style>

@@ -123,6 +123,11 @@ class ProFootball_Player_Profile {
 		$sections = get_option( 'profootball_player_sections', array() );
 		if ( empty( $sections ) ) return;
 
+		// Ensure we have the necessary functions for file uploads
+		require_once( ABSPATH . 'wp-admin/includes/image.php' );
+		require_once( ABSPATH . 'wp-admin/includes/file.php' );
+		require_once( ABSPATH . 'wp-admin/includes/media.php' );
+
 		foreach ( $sections as $section ) {
 			if ( empty( $section['fields'] ) ) continue;
 
@@ -132,14 +137,26 @@ class ProFootball_Player_Profile {
 					$mapping = 'unmapped_field_' . sanitize_title( $field['label'] );
 				}
 
-				$value = isset( $_POST[ $mapping ] ) ? $_POST[ $mapping ] : '';
-
-				// 1. Sync to User Meta (UMP)
-				if ( $field['type'] === 'file' || $field['type'] === 'image' || $field['type'] === 'gallery' || $field['type'] === 'video' ) {
-					update_user_meta( $user_id, $mapping, sanitize_text_field( $value ) );
+				// Handle File/Image uploads separately
+				if ( ( $field['type'] === 'file' || $field['type'] === 'image' ) && ! empty( $_FILES[ $mapping ]['name'] ) ) {
+					// Upload the file
+					$attachment_id = media_handle_upload( $mapping, 0 );
+					if ( ! is_wp_error( $attachment_id ) ) {
+						update_user_meta( $user_id, $mapping, $attachment_id );
+						$value = $attachment_id;
+					} else {
+						$value = get_user_meta( $user_id, $mapping, true );
+					}
 				} else {
-					$clean_value = is_array($value) ? array_map('sanitize_text_field', $value) : wp_kses_post( $value );
-					update_user_meta( $user_id, $mapping, $clean_value );
+					$value = isset( $_POST[ $mapping ] ) ? $_POST[ $mapping ] : '';
+					
+					// 1. Sync to User Meta (UMP)
+					if ( $field['type'] === 'gallery' || $field['type'] === 'video' ) {
+						update_user_meta( $user_id, $mapping, sanitize_text_field( $value ) );
+					} else {
+						$clean_value = is_array($value) ? array_map('sanitize_text_field', $value) : wp_kses_post( $value );
+						update_user_meta( $user_id, $mapping, $clean_value );
+					}
 				}
 
 				// 2. Sync to SportsPress Player Post if linked
