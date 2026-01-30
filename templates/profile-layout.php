@@ -8,6 +8,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $player_id = isset( $player_id ) ? $player_id : get_the_ID();
 $user_id = get_post_meta( $player_id, '_sp_user_id', true );
+if ( ! $user_id ) {
+    $user_id = get_post_meta( $player_id, 'sp_user', true );
+}
 
 // Plugin Settings
 $sections = get_option( 'profootball_player_sections', array() );
@@ -133,6 +136,7 @@ if ( is_user_logged_in() ) {
                                     $mapping = ! empty( $field['mapping'] ) ? $field['mapping'] : '';
                                     if ( empty( $mapping ) ) {
                                         $mapping = 'unmapped_field_' . sanitize_title( $field['label'] );
+                                        $field['mapping'] = $mapping; // Ensure the render function sees the mapping
                                     }
                                     $value = get_user_meta( $user_id, $mapping, true );
                                 }
@@ -146,6 +150,7 @@ if ( is_user_logged_in() ) {
                                 <div class="profootball-field-item field-type-<?php echo esc_attr( $field['type'] ); ?>">
                                     <span class="field-label"><?php echo esc_html( $field['label'] ); ?></span>
                                     <div class="field-content">
+                                        <!-- Debug: User: <?php echo $user_id; ?>, Mapping: <?php echo $mapping; ?> -->
                                         <?php render_profootball_public_field( $field, $value ); ?>
                                     </div>
                                 </div>
