@@ -33,7 +33,10 @@ if ( empty( $sections ) ) {
 				<?php if ( ! empty( $section['fields'] ) ) : ?>
 					<?php foreach ( $section['fields'] as $field ) : 
 						$mapping = ! empty( $field['mapping'] ) ? $field['mapping'] : '';
-						if ( empty( $mapping ) ) continue;
+						// We show the field even if not mapped, but mapping is recommended for sync
+						if ( empty( $mapping ) ) {
+							$mapping = 'unmapped_field_' . sanitize_title( $field['label'] );
+						}
 						
 						$value = get_user_meta( $user_id, $mapping, true );
 						$is_taxonomy = ( strpos( $mapping, 'tax_' ) === 0 );

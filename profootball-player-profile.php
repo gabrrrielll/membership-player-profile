@@ -128,7 +128,9 @@ class ProFootball_Player_Profile {
 
 			foreach ( $section['fields'] as $field ) {
 				$mapping = ! empty( $field['mapping'] ) ? $field['mapping'] : '';
-				if ( empty( $mapping ) ) continue;
+				if ( empty( $mapping ) ) {
+					$mapping = 'unmapped_field_' . sanitize_title( $field['label'] );
+				}
 
 				$value = isset( $_POST[ $mapping ] ) ? $_POST[ $mapping ] : '';
 
@@ -232,7 +234,14 @@ class ProFootball_Player_Profile {
 
 	public function inline_frontend_css() {
 		$account_page_id = get_option( 'ihc_general_user_page' );
-		if ( ! is_singular( 'sp_player' ) && ! is_page( $account_page_id ) ) return;
+		$is_player = is_singular( 'sp_player' );
+
+		if ( ! is_page( $account_page_id ) ) {
+			if ( ! $is_player ) return;
+			$player_id = get_the_ID();
+			$user_id = get_post_meta( $player_id, '_sp_user_id', true );
+			if ( ! $this->is_player_sync_allowed( $user_id ) ) return;
+		}
 
 		$css_path = PROFOOTBALL_PLAYER_PROFILE_PATH . 'assets/css/style.css';
 		echo '<style type="text/css">';
@@ -246,7 +255,14 @@ class ProFootball_Player_Profile {
 
 	public function inline_frontend_js() {
 		$account_page_id = get_option( 'ihc_general_user_page' );
-		if ( ! is_singular( 'sp_player' ) && ! is_page( $account_page_id ) ) return;
+		$is_player = is_singular( 'sp_player' );
+
+		if ( ! is_page( $account_page_id ) ) {
+			if ( ! $is_player ) return;
+			$player_id = get_the_ID();
+			$user_id = get_post_meta( $player_id, '_sp_user_id', true );
+			if ( ! $this->is_player_sync_allowed( $user_id ) ) return;
+		}
 
 		$js_path = PROFOOTBALL_PLAYER_PROFILE_PATH . 'assets/js/scripts.js';
 		if ( file_exists( $js_path ) ) {
@@ -259,9 +275,35 @@ class ProFootball_Player_Profile {
 	 */
 	public function override_player_content( $content ) {
 		if ( is_singular( 'sp_player' ) && in_the_loop() && is_main_query() ) {
-			return $this->render_player_profile( array( 'id' => get_the_ID() ) );
+			$player_id = get_the_ID();
+			$user_id = get_post_meta( $player_id, '_sp_user_id', true );
+			
+			if ( $this->is_player_sync_allowed( $user_id ) ) {
+				return $this->render_player_profile( array( 'id' => $player_id ) );
+			}
 		}
 		return $content;
+	}
+
+	/**
+	 * Check if a user/player is allowed to use the premium integration based on membership
+	 */
+	public function is_player_sync_allowed( $user_id ) {
+		if ( current_user_can( 'manage_options' ) ) return true;
+		if ( ! $user_id ) return false;
+
+		$sync_memberships = get_option( 'profootball_sync_memberships', array() );
+		if ( empty( $sync_memberships ) ) return false;
+
+		if ( function_exists( 'ihc_get_user_levels' ) ) {
+			$user_levels = ihc_get_user_levels( $user_id, true );
+			foreach ( (array)$sync_memberships as $lid ) {
+				if ( in_array( $lid, $user_levels ) ) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	/**
