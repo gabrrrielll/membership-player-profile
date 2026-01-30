@@ -129,8 +129,12 @@ if ( is_user_logged_in() ) {
                                 <?php 
                                 // Fetch data from UMP mapping
                                 $value = '';
-                                if ( $user_id && ! empty( $field['mapping'] ) ) {
-                                    $value = get_user_meta( $user_id, $field['mapping'], true );
+                                if ( $user_id ) {
+                                    $mapping = ! empty( $field['mapping'] ) ? $field['mapping'] : '';
+                                    if ( empty( $mapping ) ) {
+                                        $mapping = 'unmapped_field_' . sanitize_title( $field['label'] );
+                                    }
+                                    $value = get_user_meta( $user_id, $mapping, true );
                                 }
 
                                 // Handle non-premium users for specific fields
