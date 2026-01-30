@@ -201,6 +201,9 @@ function render_profootball_public_field( $field, $value ) {
         case 'image':
             $img_url = is_numeric( $value ) ? wp_get_attachment_url( $value ) : $value;
             echo '<img src="' . esc_url( $img_url ) . '" class="profootball-field-image">';
+            if ( ! empty( $field['show_download'] ) && $field['show_download'] === '1' ) {
+                echo '<div class="profootball-download-wrap"><a href="' . esc_url( $img_url ) . '" class="profootball-download-link secondary" download>Download Image</a></div>';
+            }
             break;
         case 'gallery':
             $ids = is_array( $value ) ? $value : explode( ',', $value );
@@ -228,7 +231,11 @@ function render_profootball_public_field( $field, $value ) {
         case 'file':
             $file_url = is_numeric( $value ) ? wp_get_attachment_url( $value ) : $value;
             $file_name = basename( $file_url );
-            echo '<a href="' . esc_url( $file_url ) . '" class="profootball-download-link" target="_blank">Download ' . esc_html( $field['label'] ) . ' (' . esc_html( $file_name ) . ')</a>';
+            if ( ! empty( $field['show_download'] ) && $field['show_download'] === '1' ) {
+                echo '<a href="' . esc_url( $file_url ) . '" class="profootball-download-link" target="_blank" download>Download ' . esc_html( $field['label'] ) . ' (' . esc_html( $file_name ) . ')</a>';
+            } else {
+                echo '<span class="file-status">File Uploaded</span>'; 
+            }
             break;
         case 'text':
         default:

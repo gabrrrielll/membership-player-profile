@@ -100,6 +100,7 @@ function render_profootball_section_row( $index, $data ) {
 								<span class="dashicons dashicons-editor-help"></span>
 							</span>
 						</th>
+						<th>Public Visibility</th>
 						<th>Action</th>
 					</tr>
 				</thead>
@@ -124,13 +125,14 @@ function render_profootball_field_row( $s_index, $f_index, $field ) {
 	$label = isset( $field['label'] ) ? $field['label'] : '';
 	$type = isset( $field['type'] ) ? $field['type'] : 'text';
 	$mapping = isset( $field['mapping'] ) ? $field['mapping'] : '';
+	$show_download = isset( $field['show_download'] ) ? $field['show_download'] : '';
 	?>
 	<tr>
 		<td>
 			<input type="text" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][label]" value="<?php echo esc_attr( $label ); ?>" placeholder="Label">
 		</td>
 		<td>
-			<select name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][type]">
+			<select name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][type]" class="field-type-select">
 				<option value="text" <?php selected( $type, 'text' ); ?>>Input Text</option>
 				<option value="textarea" <?php selected( $type, 'textarea' ); ?>>Textarea / Editor</option>
 				<option value="select" <?php selected( $type, 'select' ); ?>>Select (Dropdown)</option>
@@ -167,6 +169,14 @@ function render_profootball_field_row( $s_index, $f_index, $field ) {
 					<?php endif; ?>
 				</optgroup>
 			</select>
+		</td>
+		<td>
+			<div class="download-toggle-wrap" <?php echo ( $type === 'file' || $type === 'image' ) ? '' : 'style="display:none;"'; ?>>
+				<label>
+					<input type="checkbox" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][show_download]" value="1" <?php checked( $show_download, '1' ); ?>>
+					Show Download link
+				</label>
+			</div>
 		</td>
 		<td>
 			<button type="button" class="remove-field button-link-delete">Remove</button>
