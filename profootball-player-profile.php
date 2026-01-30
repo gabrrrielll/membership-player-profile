@@ -152,8 +152,14 @@ class ProFootball_Player_Profile {
 						}
 					} 
 					// Check if it's a specific SP meta field
-					elseif ( in_array( $mapping, array( '_sp_number', 'sp_nationality', 'sp_metrics' ) ) ) {
+					elseif ( in_array( $mapping, array( '_sp_number', 'sp_nationality', 'sp_metrics', 'sp_video', 'sp_hometown', 'sp_birthday' ) ) ) {
 						update_post_meta( $player_id, $mapping, sanitize_text_field( $value ) );
+					}
+					// Special case for Featured Image
+					elseif ( $mapping === '_thumbnail_id' ) {
+						if ( is_numeric( $value ) ) {
+							set_post_thumbnail( $player_id, intval( $value ) );
+						}
 					}
 				}
 			}
@@ -208,8 +214,13 @@ class ProFootball_Player_Profile {
 					update_user_meta( $user_id, $mapping, $terms );
 				} 
 				// If it's a specific SP meta
-				elseif ( in_array( $mapping, array( '_sp_number', 'sp_nationality', 'sp_metrics' ) ) ) {
+				elseif ( in_array( $mapping, array( '_sp_number', 'sp_nationality', 'sp_metrics', 'sp_video', 'sp_hometown', 'sp_birthday' ) ) ) {
 					$val = get_post_meta( $post_id, $mapping, true );
+					update_user_meta( $user_id, $mapping, $val );
+				}
+				// If it's the featured image
+				elseif ( $mapping === '_thumbnail_id' ) {
+					$val = get_post_thumbnail_id( $post_id );
 					update_user_meta( $user_id, $mapping, $val );
 				}
 			}

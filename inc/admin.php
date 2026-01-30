@@ -84,12 +84,37 @@ class ProFootball_Admin {
 			array( 'name' => '_sp_number', 'label' => 'SP: Squad Number' ),
 			array( 'name' => 'sp_nationality', 'label' => 'SP: Nationality (ISO)' ),
 			array( 'name' => 'sp_metrics', 'label' => 'SP: Metrics (Height/Weight)' ),
+			array( 'name' => '_thumbnail_id', 'label' => 'SP: Profile Photo (Featured Image)' ),
+			array( 'name' => 'sp_video', 'label' => 'SP: Video URL' ),
+			array( 'name' => 'sp_hometown', 'label' => 'SP: Hometown' ),
+			array( 'name' => 'sp_birthday', 'label' => 'SP: Birthday' ),
 		);
 
+		// Manually add common SP taxonomies in case they aren't detected for some reason
+		$common_sp_tax = array(
+			'sp_position' => 'Positions',
+			'sp_league'   => 'Leagues',
+			'sp_season'   => 'Seasons',
+			'sp_team'     => 'Teams (Current/Past)',
+		);
+
+		foreach ( $common_sp_tax as $tax_slug => $tax_label ) {
+			if ( taxonomy_exists( $tax_slug ) ) {
+				$sp_fields[] = array( 'name' => 'tax_' . $tax_slug, 'label' => 'SP Taxonomy: ' . $tax_label );
+			}
+		}
+
+		// Also try to dynamic detect others
 		$taxonomies = get_object_taxonomies( 'sp_player', 'objects' );
 		if ( ! empty( $taxonomies ) ) {
 			foreach ( $taxonomies as $tax ) {
-				$sp_fields[] = array( 'name' => 'tax_' . $tax->name, 'label' => 'SP Taxonomy: ' . $tax->label );
+				$tax_key = 'tax_' . $tax->name;
+				// Avoid duplicates
+				$exists = false;
+				foreach($sp_fields as $f) { if($f['name'] === $tax_key) { $exists = true; break; } }
+				if (!$exists) {
+					$sp_fields[] = array( 'name' => $tax_key, 'label' => 'SP Taxonomy: ' . $tax->label );
+				}
 			}
 		}
 
