@@ -78,6 +78,20 @@ class ProFootball_Admin {
 			$ump_fields = ihc_get_user_reg_fields();
 		}
 
+		// Fetch SportsPress Taxonomies & Meta for mapping
+		$sp_fields = array(
+			array( 'name' => '_sp_number', 'label' => 'SP: Squad Number' ),
+			array( 'name' => 'sp_nationality', 'label' => 'SP: Nationality (ISO)' ),
+			array( 'name' => 'sp_metrics', 'label' => 'SP: Metrics (Height/Weight)' ),
+		);
+
+		$taxonomies = get_object_taxonomies( 'sp_player', 'objects' );
+		if ( ! empty( $taxonomies ) ) {
+			foreach ( $taxonomies as $tax ) {
+				$sp_fields[] = array( 'name' => 'tax_' . $tax->name, 'label' => 'SP Taxonomy: ' . $tax->label );
+			}
+		}
+
 		$sections = get_option( 'profootball_player_sections', array() );
 		$allowed_memberships = get_option( 'profootball_allowed_memberships', array() );
 

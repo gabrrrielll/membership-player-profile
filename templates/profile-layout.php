@@ -172,6 +172,28 @@ function render_profootball_public_field( $field, $value ) {
         return;
     }
 
+    $mapping = !empty($field['mapping']) ? $field['mapping'] : '';
+    $is_taxonomy = (strpos($mapping, 'tax_') === 0);
+
+    // If it's a taxonomy mapping, $value is likely an array of term IDs
+    if ($is_taxonomy) {
+        $taxonomy = substr($mapping, 4);
+        $term_ids = is_array($value) ? $value : explode(',', $value);
+        $term_names = array();
+        foreach ($term_ids as $tid) {
+            $term = get_term($tid, $taxonomy);
+            if ($term && !is_wp_error($term)) {
+                $term_names[] = $term->name;
+            }
+        }
+        if (!empty($term_names)) {
+            echo esc_html(implode(', ', $term_names));
+        } else {
+            echo '<span class="empty-field">N/A</span>';
+        }
+        return;
+    }
+
     switch ( $field['type'] ) {
         case 'textarea':
             echo wp_kses_post( wpautop( $value ) );
@@ -181,13 +203,12 @@ function render_profootball_public_field( $field, $value ) {
             echo '<img src="' . esc_url( $img_url ) . '" class="profootball-field-image">';
             break;
         case 'gallery':
-            // Assume $value is comma-separated IDs or array
             $ids = is_array( $value ) ? $value : explode( ',', $value );
             ?>
             <div class="profootball-gallery-slider">
                 <div class="slider-wrapper">
                     <?php foreach ( $ids as $id ) : 
-                        $url = wp_get_attachment_url( trim( $id ) );
+                        $url = is_numeric($id) ? wp_get_attachment_url( trim( $id ) ) : $id;
                         if ( $url ) : ?>
                         <div class="slider-item">
                             <img src="<?php echo esc_url( $url ); ?>">
@@ -202,7 +223,6 @@ function render_profootball_public_field( $field, $value ) {
             <?php
             break;
         case 'video':
-            // Simple embed logic
             echo wp_oembed_get( $value );
             break;
         case 'file':

@@ -126,17 +126,30 @@ function render_profootball_field_row( $s_index, $f_index, $field ) {
 		</td>
 		<td>
 			<select name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][mapping]" class="ump-mapping-select">
-				<option value="">-- Select UMP Field --</option>
-				<?php if ( ! empty( $ump_fields ) ) : ?>
-					<?php foreach ( $ump_fields as $u_field ) : 
-						if ( empty( $u_field['name'] ) ) continue;
-						$f_label = ! empty( $u_field['label'] ) ? $u_field['label'] : $u_field['name'];
-						?>
-						<option value="<?php echo esc_attr( $u_field['name'] ); ?>" <?php selected( $mapping, $u_field['name'] ); ?>>
-							<?php echo esc_html( $f_label . ' (' . $u_field['name'] . ')' ); ?>
-						</option>
-					<?php endforeach; ?>
-				<?php endif; ?>
+				<option value="">-- Select Field Mapping --</option>
+				
+				<optgroup label="Ultimate Membership Pro">
+					<?php if ( ! empty( $ump_fields ) ) : ?>
+						<?php foreach ( $ump_fields as $u_field ) : 
+							if ( empty( $u_field['name'] ) ) continue;
+							$f_label = ! empty( $u_field['label'] ) ? $u_field['label'] : $u_field['name'];
+							?>
+							<option value="<?php echo esc_attr( $u_field['name'] ); ?>" <?php selected( $mapping, $u_field['name'] ); ?>>
+								<?php echo esc_html( $f_label . ' (' . $u_field['name'] . ')' ); ?>
+							</option>
+						<?php endforeach; ?>
+					<?php endif; ?>
+				</optgroup>
+
+				<optgroup label="SportsPress Attributes">
+					<?php if ( ! empty( $GLOBALS['sp_fields'] ) ) : ?>
+						<?php foreach ( $GLOBALS['sp_fields'] as $sp_f ) : ?>
+							<option value="<?php echo esc_attr( $sp_f['name'] ); ?>" <?php selected( $mapping, $sp_f['name'] ); ?>>
+								<?php echo esc_html( $sp_f['label'] ); ?>
+							</option>
+						<?php endforeach; ?>
+					<?php endif; ?>
+				</optgroup>
 			</select>
 		</td>
 		<td>

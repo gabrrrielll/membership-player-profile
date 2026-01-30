@@ -47,8 +47,11 @@ class ProFootball_Player_Profile {
 		add_filter( 'ihc_filter_custom_menu_items', array( $this, 'add_ump_account_tab' ), 10, 1 );
 		add_filter( 'ihc_account_page_custom_tab_content', array( $this, 'add_ump_account_tab_content' ), 10, 2 );
 		
-		// Handle Profile Save
+		// Handle Profile Save from Frontend
 		add_action( 'init', array( $this, 'handle_player_profile_save' ) );
+
+		// Sync from Admin (SportsPress Edit Page) to User Meta
+		add_action( 'save_post_sp_player', array( $this, 'sync_player_to_user_meta' ), 15, 3 );
 	}
 
 	public function add_settings_link( $links ) {
@@ -115,6 +118,7 @@ class ProFootball_Player_Profile {
 		$user_id = get_current_user_id();
 		if ( ! $user_id ) return;
 
+		$player_id = $this->get_player_id_by_user( $user_id );
 		$sections = get_option( 'profootball_player_sections', array() );
 		if ( empty( $sections ) ) return;
 
@@ -125,25 +129,39 @@ class ProFootball_Player_Profile {
 				$mapping = ! empty( $field['mapping'] ) ? $field['mapping'] : '';
 				if ( empty( $mapping ) ) continue;
 
+				$value = isset( $_POST[ $mapping ] ) ? $_POST[ $mapping ] : '';
+
+				// 1. Sync to User Meta (UMP)
 				if ( $field['type'] === 'file' || $field['type'] === 'image' || $field['type'] === 'gallery' || $field['type'] === 'video' ) {
-					if ( isset( $_POST[ $mapping ] ) ) {
-						update_user_meta( $user_id, $mapping, sanitize_text_field( $_POST[ $mapping ] ) );
-					}
+					update_user_meta( $user_id, $mapping, sanitize_text_field( $value ) );
 				} else {
-					if ( isset( $_POST[ $mapping ] ) ) {
-						update_user_meta( $user_id, $mapping, wp_kses_post( $_POST[ $mapping ] ) );
+					$clean_value = is_array($value) ? array_map('sanitize_text_field', $value) : wp_kses_post( $value );
+					update_user_meta( $user_id, $mapping, $clean_value );
+				}
+
+				// 2. Sync to SportsPress Player Post if linked
+				if ( $player_id ) {
+					// Check if it's a taxonomy mapping (e.g. tax_sp_position)
+					if ( strpos( $mapping, 'tax_' ) === 0 ) {
+						$taxonomy = substr( $mapping, 4 );
+						if ( taxonomy_exists( $taxonomy ) ) {
+							$term_ids = is_array( $value ) ? array_map( 'intval', $value ) : array( intval( $value ) );
+							$term_ids = array_filter( $term_ids ); // remove zeros
+							wp_set_object_terms( $player_id, $term_ids, $taxonomy );
+						}
+					} 
+					// Check if it's a specific SP meta field
+					elseif ( in_array( $mapping, array( '_sp_number', 'sp_nationality', 'sp_metrics' ) ) ) {
+						update_post_meta( $player_id, $mapping, sanitize_text_field( $value ) );
 					}
 				}
 			}
 		}
 
-		// Update linked SportsPress Player if exists (Nationality etc)
+		// Backward compatibility / convenience for Nationality
 		$nationality = get_user_meta( $user_id, 'nationality', true );
-		if ( $nationality ) {
-			$player_id = $this->get_player_id_by_user( $user_id );
-			if ( $player_id ) {
-				update_post_meta( $player_id, 'sp_nationality', $nationality );
-			}
+		if ( $nationality && $player_id ) {
+			update_post_meta( $player_id, 'sp_nationality', $nationality );
 		}
 
 		wp_redirect( add_query_arg( 'profootball_save', 'success' ) );
@@ -159,6 +177,45 @@ class ProFootball_Player_Profile {
 			'fields'     => 'ids'
 		) );
 		return ! empty( $posts ) ? $posts[0] : false;
+	}
+
+	/**
+	 * Sync data from SportsPress Admin edit to User Meta
+	 */
+	public function sync_player_to_user_meta( $post_id, $post, $update ) {
+		if ( wp_is_post_revision( $post_id ) ) return;
+		
+		$user_id = get_post_meta( $post_id, '_sp_user_id', true );
+		if ( ! $user_id ) return;
+
+		$sections = get_option( 'profootball_player_sections', array() );
+		if ( empty( $sections ) ) return;
+
+		// We need to avoid infinite loop since handle_player_profile_save also updates things
+		remove_action( 'save_post_sp_player', array( $this, 'sync_player_to_user_meta' ), 15 );
+
+		foreach ( $sections as $section ) {
+			if ( empty( $section['fields'] ) ) continue;
+			foreach ( $section['fields'] as $field ) {
+				$mapping = ! empty( $field['mapping'] ) ? $field['mapping'] : '';
+				if ( ! $mapping ) continue;
+
+				// If it's a taxonomy
+				if ( strpos( $mapping, 'tax_' ) === 0 ) {
+					$taxonomy = substr( $mapping, 4 );
+					$terms = wp_get_object_terms( $post_id, $taxonomy, array( 'fields' => 'ids' ) );
+					update_user_meta( $user_id, $mapping, $terms );
+				} 
+				// If it's a specific SP meta
+				elseif ( in_array( $mapping, array( '_sp_number', 'sp_nationality', 'sp_metrics' ) ) ) {
+					$val = get_post_meta( $post_id, $mapping, true );
+					update_user_meta( $user_id, $mapping, $val );
+				}
+			}
+		}
+
+		// Re-add action
+		add_action( 'save_post_sp_player', array( $this, 'sync_player_to_user_meta' ), 15, 3 );
 	}
 
 	public function inline_frontend_css() {

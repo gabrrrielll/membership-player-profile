@@ -34,12 +34,30 @@ if ( empty( $sections ) ) {
 					<?php foreach ( $section['fields'] as $field ) : 
 						$mapping = ! empty( $field['mapping'] ) ? $field['mapping'] : '';
 						if ( empty( $mapping ) ) continue;
+						
 						$value = get_user_meta( $user_id, $mapping, true );
+						$is_taxonomy = ( strpos( $mapping, 'tax_' ) === 0 );
+						$taxonomy = $is_taxonomy ? substr( $mapping, 4 ) : '';
 						?>
 						<div class="profootball-form-field">
 							<label><?php echo esc_html( $field['label'] ); ?></label>
 							
-							<?php if ( $field['type'] === 'textarea' ) : ?>
+							<?php if ( $is_taxonomy && taxonomy_exists( $taxonomy ) ) : 
+								$terms = get_terms( array( 'taxonomy' => $taxonomy, 'hide_empty' => false ) );
+								// Get current terms for player if exists
+								$player_id = ( new ProFootball_Player_Profile() )->get_player_id_by_user( $user_id );
+								$current_terms = $player_id ? wp_get_object_terms( $player_id, $taxonomy, array( 'fields' => 'ids' ) ) : array();
+								?>
+								<select name="<?php echo esc_attr( $mapping ); ?>[]" multiple class="profootball-select2-style">
+									<?php foreach ( $terms as $term ) : ?>
+										<option value="<?php echo $term->term_id; ?>" <?php selected( in_array( $term->term_id, $current_terms ) ); ?>>
+											<?php echo esc_html( $term->name ); ?>
+										</option>
+									<?php endforeach; ?>
+								</select>
+								<p class="field-desc">Hold Ctrl (Cmd) to select multiple values.</p>
+
+							<?php elseif ( $field['type'] === 'textarea' ) : ?>
 								<textarea name="<?php echo esc_attr( $mapping ); ?>" rows="4"><?php echo esc_textarea( $value ); ?></textarea>
 							
 							<?php elseif ( $field['type'] === 'select' ) : ?>
@@ -53,7 +71,6 @@ if ( empty( $sections ) ) {
 								<p class="field-desc">Paste the link to your video (YouTube, Vimeo, etc.).</p>
 
 							<?php elseif ( $field['type'] === 'file' || $field['type'] === 'image' ) : ?>
-								<!-- Integration with Media Library or simple URL for now -->
 								<input type="text" name="<?php echo esc_attr( $mapping ); ?>" value="<?php echo esc_attr( $value ); ?>" placeholder="File/Image ID or URL">
 								<p class="field-desc">Use UMP Profile Details tab to upload files if needed, then paste the ID here.</p>
 							
@@ -110,5 +127,18 @@ if ( empty( $sections ) ) {
 }
 .profootball-form-submit {
 	margin-top: 20px;
+}
+.profootball-form-field select[multiple] {
+	height: auto;
+	min-height: 120px;
+	background: #fff;
+}
+.profootball-form-field select option {
+	padding: 8px;
+	border-bottom: 1px solid #eee;
+}
+.profootball-form-field select option:checked {
+	background: #d4af37 content-box;
+	color: #fff;
 }
 </style>
