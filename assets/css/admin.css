@@ -131,3 +131,76 @@
 	width: 18px;
 	height: 18px;
 }
+
+/* Visualizer & Custom CSS Styles */
+.visualizer-container {
+	background: #f1f5f9;
+	padding: 20px;
+	border-radius: 8px;
+	min-height: 100px;
+}
+
+.preview-section {
+	background: #fff;
+	border: 1px solid #cbd5e1;
+	margin-bottom: 20px;
+	padding: 15px;
+	border-radius: 6px;
+}
+
+.preview-section-title {
+	font-weight: bold;
+	margin-bottom: 10px;
+	border-bottom: 1px solid #eee;
+	padding-bottom: 5px;
+	color: #334155;
+}
+
+.preview-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+}
+
+.preview-field {
+	background: #e2e8f0;
+	border: 1px solid #94a3b8;
+	padding: 10px;
+	border-radius: 4px;
+	text-align: center;
+	font-size: 11px;
+	color: #475569;
+	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.preview-col-12 {
+	width: 100%;
+}
+
+.preview-col-8 {
+	width: calc(66.66% - 10px);
+}
+
+.preview-col-6 {
+	width: calc(50% - 10px);
+}
+
+.preview-col-4 {
+	width: calc(33.33% - 10px);
+}
+
+.preview-col-3 {
+	width: calc(25% - 10px);
+}
+
+textarea[name="profootball_custom_css"] {
+	border-radius: 4px;
+	padding: 15px;
+	font-size: 13px;
+	line-height: 1.5;
+	border: 1px solid #cbd5e1;
+	margin-top: 10px;
+}

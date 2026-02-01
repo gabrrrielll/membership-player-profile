@@ -32,6 +32,7 @@ class ProFootball_Admin {
 		register_setting( 'profootball_player_settings_group', 'profootball_player_sections' );
 		register_setting( 'profootball_player_settings_group', 'profootball_allowed_memberships' );
 		register_setting( 'profootball_player_settings_group', 'profootball_sync_memberships' );
+		register_setting( 'profootball_player_settings_group', 'profootball_custom_css' );
 	}
 
 	public function inline_admin_css() {
@@ -121,6 +122,7 @@ class ProFootball_Admin {
 		$sections = get_option( 'profootball_player_sections', array() );
 		$allowed_memberships = get_option( 'profootball_allowed_memberships', array() );
 		$sync_memberships = get_option( 'profootball_sync_memberships', array() );
+		$custom_css = get_option( 'profootball_custom_css', '' );
 
 		include PROFOOTBALL_PLAYER_PROFILE_PATH . 'templates/admin-settings.php';
 	}

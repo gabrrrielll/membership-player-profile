@@ -53,6 +53,42 @@ jQuery(document).ready(function ($) {
         } else {
             $row.find('.download-toggle-wrap').fadeOut();
         }
+        updateLayoutPreview();
     });
+
+    // Update preview on any change
+    $(document).on('input change', '.section-title-input, .field-label-preview, .field-width-select', function () {
+        updateLayoutPreview();
+    });
+
+    // Make visualizer update on sort
+    $('#profootball-sections-container').on('sortupdate', function () {
+        updateLayoutPreview();
+    });
+
+    function updateLayoutPreview() {
+        var $visualizer = $('#profootball-layout-visualizer');
+        if (!$visualizer.length) return;
+        $visualizer.empty();
+
+        $('.profootball-section-item').each(function () {
+            var sectionTitle = $(this).find('.section-title-input').val() || 'Untitled Section';
+            var $sectionBox = $('<div class="preview-section"><div class="preview-section-title">' + sectionTitle + '</div><div class="preview-row"></div></div>');
+
+            $(this).find('.fields-list tr').each(function () {
+                var label = $(this).find('.field-label-preview').val() || 'Field';
+                var width = $(this).find('.field-width-select').val() || '12';
+
+                var widthClass = 'preview-col-' + width;
+                var $fieldMock = $('<div class="preview-field ' + widthClass + '"><span>' + label + '</span></div>');
+                $sectionBox.find('.preview-row').append($fieldMock);
+            });
+
+            $visualizer.append($sectionBox);
+        });
+    }
+
+    // Initialize preview
+    updateLayoutPreview();
 
 });

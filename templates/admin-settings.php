@@ -63,8 +63,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</div>
 		</div>
 
+		<div class="profootball-main-card">
+			<h2>Custom Styles (CSS)</h2>
+			<p>Add your custom CSS here to override the default styles of the player profile.</p>
+			<textarea name="profootball_custom_css" rows="10" style="width: 100%; font-family: monospace; background: #222; color: #0f0;"><?php echo esc_textarea( $custom_css ); ?></textarea>
+		</div>
+
 		<?php submit_button( 'Save All Settings' ); ?>
 	</form>
+
+	<div class="profootball-main-card" id="profootball-layout-preview-wrap">
+		<h2>Live Layout Preview (Mock)</h2>
+		<p>This is a simplified preview of how the elements are arranged in sections. Save settings to refresh the logic.</p>
+		<div id="profootball-layout-visualizer" class="visualizer-container">
+			<!-- Populated by JS -->
+		</div>
+	</div>
 </div>
 
 <!-- Template for JS -->
@@ -92,16 +106,13 @@ function render_profootball_section_row( $index, $data ) {
 			<table class="widefat field-table">
 				<thead>
 					<tr>
-						<th>Field Label</th>
-						<th>Field Type</th>
-						<th>
-							UMP Mapping (Slug)
-							<span class="profootball-help-icon" title="Aici trebuie să introduci 'Slug-ul' (numele tehnic) al câmpului din Ultimate Membership Pro (UMP). Exemplu: dacă în UMP ai creat un câmp pentru înălțime cu slug-ul 'player_height', scrie aici 'player_height'. Datele completate de jucător în acel câmp vor apărea automat în această secțiune a profilului.">
-								<span class="dashicons dashicons-editor-help"></span>
-							</span>
-						</th>
-						<th>Public Visibility</th>
-						<th>Action</th>
+						<th width="15%">Label</th>
+						<th width="12%">Type</th>
+						<th width="15%">Mapping (Slug)</th>
+						<th width="10%">Width</th>
+						<th width="15%">CSS Class/ID</th>
+						<th width="12%">Options</th>
+						<th width="5%">Action</th>
 					</tr>
 				</thead>
 				<tbody class="fields-list">
@@ -125,61 +136,68 @@ function render_profootball_field_row( $s_index, $f_index, $field ) {
 	$label = isset( $field['label'] ) ? $field['label'] : '';
 	$type = isset( $field['type'] ) ? $field['type'] : 'text';
 	$mapping = isset( $field['mapping'] ) ? $field['mapping'] : '';
+	$width = isset( $field['width'] ) ? $field['width'] : '12';
+	$css_class = isset( $field['css_class'] ) ? $field['css_class'] : '';
+	$css_id = isset( $field['css_id'] ) ? $field['css_id'] : '';
 	$show_download = isset( $field['show_download'] ) ? $field['show_download'] : '';
 	?>
-	<tr>
+	<tr class="field-config-row">
 		<td>
-			<input type="text" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][label]" value="<?php echo esc_attr( $label ); ?>" placeholder="Label">
+			<input type="text" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][label]" value="<?php echo esc_attr( $label ); ?>" placeholder="Label" class="field-label-preview">
 		</td>
 		<td>
 			<select name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][type]" class="field-type-select">
 				<option value="text" <?php selected( $type, 'text' ); ?>>Input Text</option>
 				<option value="textarea" <?php selected( $type, 'textarea' ); ?>>Textarea / Editor</option>
 				<option value="select" <?php selected( $type, 'select' ); ?>>Select (Dropdown)</option>
-				<option value="image" <?php selected( $type, 'image' ); ?>>Single Image / Graphic</option>
+				<option value="image" <?php selected( $type, 'image' ); ?>>Single Image</option>
 				<option value="gallery" <?php selected( $type, 'gallery' ); ?>>Gallery Slider</option>
-				<option value="video" <?php selected( $type, 'video' ); ?>>Video Link Preview</option>
-				<option value="file" <?php selected( $type, 'file' ); ?>>File Download (CV)</option>
+				<option value="video" <?php selected( $type, 'video' ); ?>>Video Link</option>
+				<option value="file" <?php selected( $type, 'file' ); ?>>File (CV)</option>
 			</select>
 		</td>
 		<td>
 			<select name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][mapping]" class="ump-mapping-select">
-				<option value="">-- Select Field Mapping --</option>
-				
+				<option value="">-- Select --</option>
 				<optgroup label="Ultimate Membership Pro">
 					<?php if ( ! empty( $ump_fields ) ) : ?>
 						<?php foreach ( $ump_fields as $u_field ) : 
 							if ( empty( $u_field['name'] ) ) continue;
 							$f_label = ! empty( $u_field['label'] ) ? $u_field['label'] : $u_field['name'];
 							?>
-							<option value="<?php echo esc_attr( $u_field['name'] ); ?>" <?php selected( $mapping, $u_field['name'] ); ?>>
-								<?php echo esc_html( $f_label . ' (' . $u_field['name'] . ')' ); ?>
-							</option>
+							<option value="<?php echo esc_attr( $u_field['name'] ); ?>" <?php selected( $mapping, $u_field['name'] ); ?>><?php echo esc_html( $f_label ); ?></option>
 						<?php endforeach; ?>
 					<?php endif; ?>
 				</optgroup>
-
-				<optgroup label="SportsPress Attributes">
+				<optgroup label="SportsPress">
 					<?php if ( ! empty( $sp_fields ) ) : ?>
 						<?php foreach ( $sp_fields as $sp_f ) : ?>
-							<option value="<?php echo esc_attr( $sp_f['name'] ); ?>" <?php selected( $mapping, $sp_f['name'] ); ?>>
-								<?php echo esc_html( $sp_f['label'] ); ?>
-							</option>
+							<option value="<?php echo esc_attr( $sp_f['name'] ); ?>" <?php selected( $mapping, $sp_f['name'] ); ?>><?php echo esc_html( $sp_f['label'] ); ?></option>
 						<?php endforeach; ?>
 					<?php endif; ?>
 				</optgroup>
 			</select>
 		</td>
 		<td>
+			<select name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][width]" class="field-width-select">
+				<option value="12" <?php selected( $width, '12' ); ?>>100% (Full)</option>
+				<option value="6" <?php selected( $width, '6' ); ?>>50% (1/2)</option>
+				<option value="4" <?php selected( $width, '4' ); ?>>33% (1/3)</option>
+				<option value="3" <?php selected( $width, '3' ); ?>>25% (1/4)</option>
+				<option value="8" <?php selected( $width, '8' ); ?>>66% (2/3)</option>
+			</select>
+		</td>
+		<td>
+			<input type="text" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][css_class]" value="<?php echo esc_attr( $css_class ); ?>" placeholder="Class" style="width:45%;">
+			<input type="text" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][css_id]" value="<?php echo esc_attr( $css_id ); ?>" placeholder="ID" style="width:45%;">
+		</td>
+		<td>
 			<div class="download-toggle-wrap" <?php echo ( $type === 'file' || $type === 'image' ) ? '' : 'style="display:none;"'; ?>>
-				<label>
-					<input type="checkbox" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][show_download]" value="1" <?php checked( $show_download, '1' ); ?>>
-					Show Download link
-				</label>
+				<label><input type="checkbox" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][show_download]" value="1" <?php checked( $show_download, '1' ); ?>> Download</label>
 			</div>
 		</td>
 		<td>
-			<button type="button" class="remove-field button-link-delete">Remove</button>
+			<button type="button" class="remove-field button-link-delete">Del</button>
 		</td>
 	</tr>
 	<?php

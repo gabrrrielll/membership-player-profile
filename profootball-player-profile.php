@@ -267,6 +267,13 @@ class ProFootball_Player_Profile {
 		}
 		// Force Icon for Player Details Tab
 		echo '.fa-player_details-account-ihc:before { content: "\\f2bd" !important; font-family: "FontAwesome" !important; }';
+		
+		// Custom CSS from admin
+		$custom_css = get_option( 'profootball_custom_css', '' );
+		if ( ! empty( $custom_css ) ) {
+			echo wp_strip_all_tags( $custom_css );
+		}
+		
 		echo '</style>';
 	}
 

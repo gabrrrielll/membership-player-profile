@@ -127,35 +127,42 @@ if ( is_user_logged_in() ) {
                     </div>
 
                     <div class="section-body">
-                        <?php if ( ! empty( $section['fields'] ) ) : ?>
-                            <?php foreach ( $section['fields'] as $field ) : ?>
-                                <?php 
-                                // Fetch data from UMP mapping
-                                $value = '';
-                                if ( $user_id ) {
-                                    $mapping = ! empty( $field['mapping'] ) ? $field['mapping'] : '';
-                                    if ( empty( $mapping ) ) {
-                                        $mapping = 'unmapped_field_' . sanitize_title( $field['label'] );
-                                        $field['mapping'] = $mapping; // Ensure the render function sees the mapping
+                        <div class="profootball-grid-row">
+                            <?php if ( ! empty( $section['fields'] ) ) : ?>
+                                <?php foreach ( $section['fields'] as $field ) : ?>
+                                    <?php 
+                                    // Fetch data from UMP mapping
+                                    $value = '';
+                                    if ( $user_id ) {
+                                        $mapping = ! empty( $field['mapping'] ) ? $field['mapping'] : '';
+                                        if ( empty( $mapping ) ) {
+                                            $mapping = 'unmapped_field_' . sanitize_title( $field['label'] );
+                                            $field['mapping'] = $mapping; // Ensure the render function sees the mapping
+                                        }
+                                        $value = get_user_meta( $user_id, $mapping, true );
                                     }
-                                    $value = get_user_meta( $user_id, $mapping, true );
-                                }
 
-                                // Handle non-premium users for specific fields
-                                if ( ! $can_view_premium && in_array( $field['type'], array( 'file', 'gallery', 'video' ) ) ) {
-                                    continue; // Skip premium fields
-                                }
-                                ?>
-                                
-                                <div class="profootball-field-item field-type-<?php echo esc_attr( $field['type'] ); ?>">
-                                    <span class="field-label"><?php echo esc_html( $field['label'] ); ?></span>
-                                    <div class="field-content">
-                                        <!-- Debug: User: <?php echo $user_id; ?>, Mapping: <?php echo $mapping; ?> -->
-                                        <?php render_profootball_public_field( $field, $value ); ?>
+                                    // Handle non-premium users for specific fields
+                                    if ( ! $can_view_premium && in_array( $field['type'], array( 'file', 'gallery', 'video' ) ) ) {
+                                        continue; // Skip premium fields
+                                    }
+
+                                    // Layout & Style Settings
+                                    $col_width = ! empty( $field['width'] ) ? $field['width'] : '12';
+                                    $css_id = ! empty( $field['css_id'] ) ? $field['css_id'] : '';
+                                    $css_class = ! empty( $field['css_class'] ) ? $field['css_class'] : '';
+                                    ?>
+                                    
+                                    <div <?php echo $css_id ? 'id="'.esc_attr($css_id).'"' : ''; ?> class="profootball-grid-col col-<?php echo esc_attr($col_width); ?> profootball-field-item field-type-<?php echo esc_attr( $field['type'] ); ?> <?php echo esc_attr($css_class); ?>">
+                                        <span class="field-label"><?php echo esc_html( $field['label'] ); ?></span>
+                                        <div class="field-content">
+                                            <!-- Debug: User: <?php echo $user_id; ?>, Mapping: <?php echo $mapping; ?> -->
+                                            <?php render_profootball_public_field( $field, $value ); ?>
+                                        </div>
                                     </div>
-                                </div>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </section>
             <?php endforeach; ?>
