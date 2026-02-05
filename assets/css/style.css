@@ -159,6 +159,15 @@
     color: #eee;
 }
 
+.profootball-multiselect-values {
+    margin: 8px 0 0;
+    padding-left: 18px;
+}
+
+.profootball-multiselect-values li {
+    margin-bottom: 4px;
+}
+
 /* Gallery Slider */
 .profootball-gallery-slider {
     position: relative;

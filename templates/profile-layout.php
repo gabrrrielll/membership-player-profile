@@ -182,6 +182,62 @@ if ( is_user_logged_in() ) {
 /**
  * Render field content based on type
  */
+function profootball_build_options_map( $raw_options ) {
+    $map = array();
+
+    if ( empty( $raw_options ) ) {
+        return $map;
+    }
+
+    if ( is_array( $raw_options ) ) {
+        foreach ( $raw_options as $key => $label ) {
+            if ( is_array( $label ) ) {
+                if ( isset( $label['value'] ) ) {
+                    $value = (string) $label['value'];
+                    $label_text = isset( $label['label'] ) ? (string) $label['label'] : $value;
+                    $map[ $value ] = $label_text;
+                }
+                continue;
+            }
+            if ( is_int( $key ) ) {
+                $value = (string) $label;
+                $label_text = (string) $label;
+            } else {
+                $value = (string) $key;
+                $label_text = (string) $label;
+            }
+            if ( $value === '' ) {
+                continue;
+            }
+            $map[ $value ] = $label_text;
+        }
+        return $map;
+    }
+
+    $raw_options = is_string( $raw_options ) ? trim( $raw_options ) : '';
+    if ( $raw_options === '' ) {
+        return $map;
+    }
+
+    $lines = preg_split( '/\r\n|\r|\n/', $raw_options );
+    if ( count( $lines ) === 1 ) {
+        $lines = explode( ',', $raw_options );
+    }
+
+    foreach ( $lines as $line ) {
+        $line = trim( $line );
+        if ( $line === '' ) {
+            continue;
+        }
+        $parts = array_map( 'trim', explode( '|', $line, 2 ) );
+        $value = (string) $parts[0];
+        $label_text = isset( $parts[1] ) && $parts[1] !== '' ? (string) $parts[1] : $value;
+        $map[ $value ] = $label_text;
+    }
+
+    return $map;
+}
+
 function render_profootball_public_field( $field, $value ) {
     if ( empty( $value ) ) {
         echo '<span class="empty-field">N/A</span>';
@@ -208,6 +264,32 @@ function render_profootball_public_field( $field, $value ) {
             echo '<span class="empty-field">N/A</span>';
         }
         return;
+    }
+
+    $options_map = ! empty( $field['options'] ) ? profootball_build_options_map( $field['options'] ) : array();
+
+    if ( $field['type'] === 'multiselect' || is_array( $value ) ) {
+        $values_list = is_array( $value ) ? $value : preg_split( '/\s*,\s*/', (string) $value );
+        $values_list = array_filter( array_map( 'trim', $values_list ), 'strlen' );
+        if ( empty( $values_list ) ) {
+            echo '<span class="empty-field">N/A</span>';
+            return;
+        }
+        echo '<ul class="profootball-multiselect-values">';
+        foreach ( $values_list as $item ) {
+            $key = (string) $item;
+            $label_text = isset( $options_map[ $key ] ) ? $options_map[ $key ] : $item;
+            echo '<li>' . esc_html( $label_text ) . '</li>';
+        }
+        echo '</ul>';
+        return;
+    }
+
+    if ( $field['type'] === 'select' && ! empty( $options_map ) ) {
+        $value_key = (string) $value;
+        if ( isset( $options_map[ $value_key ] ) ) {
+            $value = $options_map[ $value_key ];
+        }
     }
 
     switch ( $field['type'] ) {

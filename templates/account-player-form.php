@@ -8,6 +8,89 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $user_id = isset( $user_id ) ? $user_id : get_current_user_id();
 $sections = get_option( 'profootball_player_sections', array() );
+$ump_fields = array();
+if ( function_exists( 'ihc_get_user_reg_fields' ) ) {
+	$ump_fields = ihc_get_user_reg_fields();
+}
+$ump_fields_by_name = array();
+if ( ! empty( $ump_fields ) ) {
+	foreach ( $ump_fields as $ump_field ) {
+		if ( ! empty( $ump_field['name'] ) ) {
+			$ump_fields_by_name[ $ump_field['name'] ] = $ump_field;
+		}
+	}
+}
+
+if ( ! function_exists( 'profootball_get_field_options' ) ) {
+	function profootball_get_field_options( $field, $ump_fields_by_name ) {
+		$raw_options = '';
+		if ( ! empty( $field['options'] ) ) {
+			$raw_options = $field['options'];
+		} else {
+			$mapping = ! empty( $field['mapping'] ) ? $field['mapping'] : '';
+			if ( $mapping && isset( $ump_fields_by_name[ $mapping ] ) ) {
+				$ump_field = $ump_fields_by_name[ $mapping ];
+				if ( isset( $ump_field['values'] ) ) {
+					$raw_options = $ump_field['values'];
+				} elseif ( isset( $ump_field['options'] ) ) {
+					$raw_options = $ump_field['options'];
+				} elseif ( isset( $ump_field['value'] ) ) {
+					$raw_options = $ump_field['value'];
+				}
+			}
+		}
+
+		$options = array();
+
+		if ( is_array( $raw_options ) ) {
+			foreach ( $raw_options as $key => $label ) {
+				if ( is_array( $label ) ) {
+					if ( isset( $label['value'] ) ) {
+						$value = $label['value'];
+						$label_text = isset( $label['label'] ) ? $label['label'] : $value;
+						$options[] = array( 'value' => (string) $value, 'label' => (string) $label_text );
+					}
+					continue;
+				}
+				if ( is_int( $key ) ) {
+					$value = $label;
+					$label_text = $label;
+				} else {
+					$value = $key;
+					$label_text = $label;
+				}
+				if ( $value === '' ) {
+					continue;
+				}
+				$options[] = array( 'value' => (string) $value, 'label' => (string) $label_text );
+			}
+			return $options;
+		}
+
+		$raw_options = is_string( $raw_options ) ? trim( $raw_options ) : '';
+		if ( $raw_options === '' ) {
+			return $options;
+		}
+
+		$lines = preg_split( '/\r\n|\r|\n/', $raw_options );
+		if ( count( $lines ) === 1 ) {
+			$lines = explode( ',', $raw_options );
+		}
+
+		foreach ( $lines as $line ) {
+			$line = trim( $line );
+			if ( $line === '' ) {
+				continue;
+			}
+			$parts = array_map( 'trim', explode( '|', $line, 2 ) );
+			$value = $parts[0];
+			$label_text = isset( $parts[1] ) && $parts[1] !== '' ? $parts[1] : $value;
+			$options[] = array( 'value' => $value, 'label' => $label_text );
+		}
+
+		return $options;
+	}
+}
 
 if ( empty( $sections ) ) {
 	echo '<p>No profile details to configure. Please contact administrator.</p>';
@@ -64,10 +147,33 @@ if ( empty( $sections ) ) {
 								<textarea name="<?php echo esc_attr( $mapping ); ?>" rows="4"><?php echo esc_textarea( $value ); ?></textarea>
 							
 							<?php elseif ( $field['type'] === 'select' ) : ?>
+								<?php
+								$options = profootball_get_field_options( $field, $ump_fields_by_name );
+								$selected_value = is_array( $value ) ? reset( $value ) : $value;
+								?>
 								<select name="<?php echo esc_attr( $mapping ); ?>">
 									<option value="">-- Select --</option>
-									<!-- Options would need to be defined in admin, for now simple text -->
+									<?php foreach ( $options as $option ) : ?>
+										<option value="<?php echo esc_attr( $option['value'] ); ?>" <?php selected( (string) $selected_value, (string) $option['value'] ); ?>>
+											<?php echo esc_html( $option['label'] ); ?>
+										</option>
+									<?php endforeach; ?>
 								</select>
+
+							<?php elseif ( $field['type'] === 'multiselect' ) : ?>
+								<?php
+								$options = profootball_get_field_options( $field, $ump_fields_by_name );
+								$selected_values = is_array( $value ) ? $value : array_filter( array_map( 'trim', explode( ',', (string) $value ) ), 'strlen' );
+								$selected_values = array_map( 'strval', $selected_values );
+								?>
+								<select name="<?php echo esc_attr( $mapping ); ?>[]" multiple class="profootball-select2-style">
+									<?php foreach ( $options as $option ) : ?>
+										<option value="<?php echo esc_attr( $option['value'] ); ?>" <?php selected( in_array( (string) $option['value'], $selected_values, true ) ); ?>>
+											<?php echo esc_html( $option['label'] ); ?>
+										</option>
+									<?php endforeach; ?>
+								</select>
+								<p class="field-desc">Hold Ctrl (Cmd) to select multiple values.</p>
 
 							<?php elseif ( $field['type'] === 'video' ) : ?>
 								<input type="url" name="<?php echo esc_attr( $mapping ); ?>" value="<?php echo esc_attr( $value ); ?>" placeholder="https://www.youtube.com/watch?v=...">
