@@ -53,6 +53,12 @@ jQuery(document).ready(function ($) {
         } else {
             $row.find('.download-toggle-wrap').fadeOut();
         }
+
+        if (type === 'select' || type === 'multiselect') {
+            $row.find('.field-options-wrap').fadeIn();
+        } else {
+            $row.find('.field-options-wrap').fadeOut();
+        }
         updateLayoutPreview();
     });
 

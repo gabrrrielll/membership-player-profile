@@ -140,6 +140,7 @@ function render_profootball_field_row( $s_index, $f_index, $field ) {
 	$css_class = isset( $field['css_class'] ) ? $field['css_class'] : '';
 	$css_id = isset( $field['css_id'] ) ? $field['css_id'] : '';
 	$show_download = isset( $field['show_download'] ) ? $field['show_download'] : '';
+	$options = isset( $field['options'] ) ? $field['options'] : '';
 	?>
 	<tr class="field-config-row">
 		<td>
@@ -150,6 +151,7 @@ function render_profootball_field_row( $s_index, $f_index, $field ) {
 				<option value="text" <?php selected( $type, 'text' ); ?>>Input Text</option>
 				<option value="textarea" <?php selected( $type, 'textarea' ); ?>>Textarea / Editor</option>
 				<option value="select" <?php selected( $type, 'select' ); ?>>Select (Dropdown)</option>
+				<option value="multiselect" <?php selected( $type, 'multiselect' ); ?>>Select (Multiple)</option>
 				<option value="image" <?php selected( $type, 'image' ); ?>>Single Image</option>
 				<option value="gallery" <?php selected( $type, 'gallery' ); ?>>Gallery Slider</option>
 				<option value="video" <?php selected( $type, 'video' ); ?>>Video Link</option>
@@ -192,6 +194,10 @@ function render_profootball_field_row( $s_index, $f_index, $field ) {
 			<input type="text" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][css_id]" value="<?php echo esc_attr( $css_id ); ?>" placeholder="ID" style="width:45%;">
 		</td>
 		<td>
+			<div class="field-options-wrap" <?php echo ( $type === 'select' || $type === 'multiselect' ) ? '' : 'style="display:none;"'; ?>>
+				<input type="text" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][options]" value="<?php echo esc_attr( $options ); ?>" placeholder="Option 1|Option 2, Option 3">
+				<small>Use commas or new lines. "value|label" supported.</small>
+			</div>
 			<div class="download-toggle-wrap" <?php echo ( $type === 'file' || $type === 'image' ) ? '' : 'style="display:none;"'; ?>>
 				<label><input type="checkbox" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][show_download]" value="1" <?php checked( $show_download, '1' ); ?>> Download</label>
 			</div>
