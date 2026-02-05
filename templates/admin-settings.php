@@ -111,7 +111,7 @@ function render_profootball_section_row( $index, $data ) {
 						<th width="15%">Mapping (Slug)</th>
 						<th width="10%">Width</th>
 						<th width="15%">CSS Class/ID</th>
-						<th width="12%">Options</th>
+						<th width="20%">Options</th>
 						<th width="5%">Action</th>
 					</tr>
 				</thead>
@@ -195,7 +195,7 @@ function render_profootball_field_row( $s_index, $f_index, $field ) {
 		</td>
 		<td>
 			<div class="field-options-wrap" <?php echo ( $type === 'select' || $type === 'multiselect' ) ? '' : 'style="display:none;"'; ?>>
-				<input type="text" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][options]" value="<?php echo esc_attr( $options ); ?>" placeholder="Option 1|Option 2, Option 3">
+				<textarea name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][options]" rows="3" placeholder="Option 1|Option 2, Option 3"><?php echo esc_textarea( $options ); ?></textarea>
 				<small>Use commas or new lines. "value|label" supported.</small>
 			</div>
 			<div class="download-toggle-wrap" <?php echo ( $type === 'file' || $type === 'image' ) ? '' : 'style="display:none;"'; ?>>
