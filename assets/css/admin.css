@@ -1,5 +1,6 @@
 .profootball-admin-wrap {
-	max-width: 1000px;
+	max-width: none;
+	width: 100%;
 	margin-top: 20px;
 }
 
@@ -93,8 +94,14 @@
 }
 
 .field-table td input,
-.field-table td select {
+.field-table td select,
+.field-table td textarea {
 	width: 100%;
+}
+
+.field-options-wrap textarea {
+	min-height: 90px;
+	resize: vertical;
 }
 
 .field-options-wrap small {
