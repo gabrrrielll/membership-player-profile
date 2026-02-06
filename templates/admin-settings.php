@@ -156,6 +156,8 @@ function render_profootball_field_row( $s_index, $f_index, $field ) {
 				<option value="gallery" <?php selected( $type, 'gallery' ); ?>>Gallery Slider</option>
 				<option value="video" <?php selected( $type, 'video' ); ?>>Video Link</option>
 				<option value="file" <?php selected( $type, 'file' ); ?>>File (CV)</option>
+				<option value="empty_space" <?php selected( $type, 'empty_space' ); ?>>Empty Space</option>
+				<option value="nationality" <?php selected( $type, 'nationality' ); ?>>Nationality (Flag)</option>
 			</select>
 		</td>
 		<td>

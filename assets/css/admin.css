@@ -190,6 +190,15 @@
 	justify-content: center;
 }
 
+.preview-field.preview-empty {
+	background: transparent;
+	border: 1px dashed #cbd5e1;
+}
+
+.field-config-row {
+	cursor: move;
+}
+
 .preview-col-12 {
 	width: 100%;
 }

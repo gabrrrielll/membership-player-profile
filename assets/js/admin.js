@@ -5,10 +5,23 @@ jQuery(document).ready(function ($) {
         handle: '.handle',
         placeholder: 'sortable-placeholder',
         update: function () {
-            // Optional: update indexes after sort if needed, 
-            // but WP handles associative arrays okay if names are unique.
+            reindexAll();
+            updateLayoutPreview();
         }
     });
+
+    // Make fields sortable within sections
+    function initFieldSortable() {
+        $('.fields-list').sortable({
+            items: 'tr',
+            placeholder: 'sortable-placeholder',
+            update: function () {
+                reindexAll();
+                updateLayoutPreview();
+            }
+        });
+    }
+    initFieldSortable();
 
     // Add New Section
     $('#add-new-section').on('click', function () {
@@ -17,6 +30,7 @@ jQuery(document).ready(function ($) {
         tpl = tpl.replace(/{{INDEX}}/g, index);
 
         $('#profootball-sections-container').append(tpl);
+        initFieldSortable();
     });
 
     // Remove Section
@@ -69,6 +83,7 @@ jQuery(document).ready(function ($) {
 
     // Make visualizer update on sort
     $('#profootball-sections-container').on('sortupdate', function () {
+        reindexAll();
         updateLayoutPreview();
     });
 
@@ -84,13 +99,39 @@ jQuery(document).ready(function ($) {
             $(this).find('.fields-list tr').each(function () {
                 var label = $(this).find('.field-label-preview').val() || 'Field';
                 var width = $(this).find('.field-width-select').val() || '12';
+                var type = $(this).find('.field-type-select').val();
 
                 var widthClass = 'preview-col-' + width;
-                var $fieldMock = $('<div class="preview-field ' + widthClass + '"><span>' + label + '</span></div>');
+                var extraClass = (type === 'empty_space') ? ' preview-empty' : '';
+                var content = (type === 'empty_space') ? '' : '<span>' + label + '</span>';
+
+                var $fieldMock = $('<div class="preview-field ' + widthClass + extraClass + '">' + content + '</div>');
                 $sectionBox.find('.preview-row').append($fieldMock);
             });
 
             $visualizer.append($sectionBox);
+        });
+    }
+
+    function reindexAll() {
+        $('.profootball-section-item').each(function (s_idx) {
+            $(this).attr('data-index', s_idx);
+
+            // Update section title input name
+            $(this).find('.section-title-input').attr('name', 'profootball_player_sections[' + s_idx + '][title]');
+
+            // Update all fields in this section
+            $(this).find('.fields-list tr').each(function (f_idx) {
+                $(this).find('input, select, textarea').each(function () {
+                    var name = $(this).attr('name');
+                    if (name) {
+                        // Replace BOTH indices: section index and field index
+                        // Name format: profootball_player_sections[OLD_S_IDX][fields][OLD_F_IDX][property]
+                        var newName = name.replace(/profootball_player_sections\[\d+\]\[fields\]\[\d+\]/, 'profootball_player_sections[' + s_idx + '][fields][' + f_idx + ']');
+                        $(this).attr('name', newName);
+                    }
+                });
+            });
         });
     }
 

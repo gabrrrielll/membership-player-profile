@@ -154,11 +154,13 @@ if ( is_user_logged_in() ) {
                                     ?>
                                     
                                     <div <?php echo $css_id ? 'id="'.esc_attr($css_id).'"' : ''; ?> class="profootball-grid-col col-<?php echo esc_attr($col_width); ?> profootball-field-item field-type-<?php echo esc_attr( $field['type'] ); ?> <?php echo esc_attr($css_class); ?>">
-                                        <span class="field-label"><?php echo esc_html( $field['label'] ); ?></span>
-                                        <div class="field-content">
-                                            <!-- Debug: User: <?php echo $user_id; ?>, Mapping: <?php echo $mapping; ?> -->
-                                            <?php render_profootball_public_field( $field, $value ); ?>
-                                        </div>
+                                        <?php if ( $field['type'] !== 'empty_space' ) : ?>
+                                            <span class="field-label"><?php echo esc_html( $field['label'] ); ?></span>
+                                            <div class="field-content">
+                                                <!-- Debug: User: <?php echo $user_id; ?>, Mapping: <?php echo $mapping; ?> -->
+                                                <?php render_profootball_public_field( $field, $value ); ?>
+                                            </div>
+                                        <?php endif; ?>
                                     </div>
                                 <?php endforeach; ?>
                             <?php endif; ?>
@@ -325,6 +327,13 @@ function render_profootball_public_field( $field, $value ) {
             break;
         case 'video':
             echo wp_oembed_get( $value );
+            break;
+        case 'nationality':
+            $country_code = strtolower( trim( $value ) );
+            echo '<div class="player-nationality dynamic">';
+            echo '<img src="https://flagcdn.com/w40/' . esc_attr( $country_code ) . '.png" onerror="this.style.display=\'none\'" class="country-flag">';
+            echo ' ' . esc_html( strtoupper( $value ) );
+            echo '</div>';
             break;
         case 'file':
             $file_url = is_numeric( $value ) ? wp_get_attachment_url( $value ) : $value;
