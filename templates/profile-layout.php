@@ -92,7 +92,7 @@ if ( is_user_logged_in() ) {
                         // For a real app, you'd have a mapping table.
                         ?>
                         <span class="player-nationality">
-                            <img src="https://flagcdn.com/w40/<?php echo esc_attr( $country_code ); ?>.png" 
+                            <img src="https://flagcdn.com/w160/<?php echo esc_attr( $country_code ); ?>.png" 
                                  onerror="this.style.display='none'"
                                  alt="<?php echo esc_attr( $nationality ); ?>" 
                                  class="country-flag">
@@ -330,8 +330,17 @@ function render_profootball_public_field( $field, $value ) {
             break;
         case 'nationality':
             $country_code = strtolower( trim( $value ) );
+            $custom_width = ! empty( $field['options'] ) ? trim( $field['options'] ) : '40px';
+            // Ensure width has a unit if it's just a number
+            if ( is_numeric( $custom_width ) ) {
+                $custom_width .= 'px';
+            }
+            // Use w320 for high resolution, then scale down with CSS width
             echo '<div class="player-nationality dynamic">';
-            echo '<img src="https://flagcdn.com/w40/' . esc_attr( $country_code ) . '.png" onerror="this.style.display=\'none\'" class="country-flag">';
+            echo '<img src="https://flagcdn.com/w320/' . esc_attr( $country_code ) . '.png" 
+                       onerror="this.style.display=\'none\'" 
+                       class="country-flag" 
+                       style="width:' . esc_attr( $custom_width ) . '; height:auto; vertical-align:middle;">';
             echo ' ' . esc_html( strtoupper( $value ) );
             echo '</div>';
             break;

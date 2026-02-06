@@ -68,8 +68,17 @@ jQuery(document).ready(function ($) {
             $row.find('.download-toggle-wrap').fadeOut();
         }
 
-        if (type === 'select' || type === 'multiselect') {
+        if (type === 'select' || type === 'multiselect' || type === 'nationality') {
             $row.find('.field-options-wrap').fadeIn();
+            var $textarea = $row.find('.field-options-wrap textarea');
+            var $small = $row.find('.field-options-wrap small');
+            if (type === 'nationality') {
+                $textarea.attr('placeholder', 'e.g. 100px or 120px');
+                $small.text('Enter flag width (e.g. 100px). Default is 40px.');
+            } else {
+                $textarea.attr('placeholder', 'Option 1|Option 2, Option 3');
+                $small.text('Use commas or new lines. "value|label" supported.');
+            }
         } else {
             $row.find('.field-options-wrap').fadeOut();
         }

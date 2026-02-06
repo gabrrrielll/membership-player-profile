@@ -196,9 +196,9 @@ function render_profootball_field_row( $s_index, $f_index, $field ) {
 			<input type="text" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][css_id]" value="<?php echo esc_attr( $css_id ); ?>" placeholder="ID" style="width:45%;">
 		</td>
 		<td>
-			<div class="field-options-wrap" <?php echo ( $type === 'select' || $type === 'multiselect' ) ? '' : 'style="display:none;"'; ?>>
-				<textarea name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][options]" rows="3" placeholder="Option 1|Option 2, Option 3"><?php echo esc_textarea( $options ); ?></textarea>
-				<small>Use commas or new lines. "value|label" supported.</small>
+			<div class="field-options-wrap" <?php echo ( in_array( $type, array( 'select', 'multiselect', 'nationality' ) ) ) ? '' : 'style="display:none;"'; ?>>
+				<textarea name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][options]" rows="3" placeholder="<?php echo $type === 'nationality' ? 'e.g. 100px or 120px' : 'Option 1|Option 2, Option 3'; ?>"><?php echo esc_textarea( $options ); ?></textarea>
+				<small><?php echo $type === 'nationality' ? 'Enter flag width (e.g. 100px). Default is 40px.' : 'Use commas or new lines. "value|label" supported.'; ?></small>
 			</div>
 			<div class="download-toggle-wrap" <?php echo ( $type === 'file' || $type === 'image' ) ? '' : 'style="display:none;"'; ?>>
 				<label><input type="checkbox" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][show_download]" value="1" <?php checked( $show_download, '1' ); ?>> Download</label>

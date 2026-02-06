@@ -246,9 +246,15 @@ if ( empty( $sections ) ) {
 										</option>
 									<?php endforeach; ?>
 								</select>
-								<?php if ( $value ) : ?>
+								<?php if ( $value ) : 
+									$custom_width = ! empty( $field['options'] ) ? trim( $field['options'] ) : '40px';
+									if ( is_numeric( $custom_width ) ) { $custom_width .= 'px'; }
+									?>
 									<div style="margin-top: 10px; display: flex; align-items: center; gap: 10px;">
-										<img src="https://flagcdn.com/w40/<?php echo esc_attr( strtolower($value) ); ?>.png" onerror="this.style.display='none'" class="country-flag">
+										<img src="https://flagcdn.com/w160/<?php echo esc_attr( strtolower($value) ); ?>.png" 
+											 onerror="this.style.display='none'" 
+											 class="country-flag" 
+											 style="width:<?php echo esc_attr($custom_width); ?>; height:auto;">
 										<span><?php echo esc_html( strtoupper($value) ); ?></span>
 									</div>
 								<?php endif; ?>
