@@ -195,28 +195,122 @@
 	border: 1px dashed #cbd5e1;
 }
 
-.field-config-row {
-	cursor: move;
+/* Admin Fields Grid Layout */
+.profootball-admin-field-header {
+	display: flex;
+	background: #f0f0f1;
+	font-weight: bold;
+	padding: 10px;
+	border: 1px solid #ccd0d4;
+	border-bottom: none;
+	display: none;
+	/* Hide header as we use inline labels for better layout */
 }
 
+.profootball-admin-grid {
+	display: flex;
+	flex-wrap: wrap;
+	background: #fff;
+	border: 1px solid #ccd0d4;
+	padding: 10px;
+	gap: 15px;
+}
+
+.profootball-admin-grid-col {
+	box-sizing: border-box;
+}
+
+.field-config-row {
+	margin-bottom: 0;
+}
+
+.field-config-inner {
+	background: #f9f9f9;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	padding: 15px;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.field-config-main {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 10px;
+}
+
+.field-input-group {
+	margin-bottom: 10px;
+}
+
+.admin-field-label {
+	display: block;
+	font-size: 11px;
+	font-weight: 600;
+	color: #666;
+	margin-bottom: 4px;
+	text-transform: uppercase;
+}
+
+.field-config-row input[type="text"],
+.field-config-row select,
+.field-config-row textarea {
+	width: 100% !important;
+	max-width: 100%;
+}
+
+.field-config-extra {
+	margin-top: 10px;
+	padding-top: 10px;
+	border-top: 1px solid #eee;
+}
+
+.remove-field {
+	margin-top: 10px !important;
+}
+
+/* Width Classes for Admin & Preview */
+.col-12,
 .preview-col-12 {
 	width: 100%;
 }
 
+.col-8,
 .preview-col-8 {
-	width: calc(66.66% - 10px);
+	width: calc(66.66% - 15px);
 }
 
+.col-6,
 .preview-col-6 {
-	width: calc(50% - 10px);
+	width: calc(50% - 15px);
 }
 
+.col-4,
 .preview-col-4 {
-	width: calc(33.33% - 10px);
+	width: calc(33.33% - 15px);
 }
 
+.col-3,
 .preview-col-3 {
-	width: calc(25% - 10px);
+	width: calc(25% - 15px);
+}
+
+@media (max-width: 1200px) {
+	.profootball-admin-grid-col {
+		width: 100% !important;
+	}
+}
+
+.preview-field.preview-empty {
+	background: transparent;
+	border: 1px dashed #cbd5e1;
+	min-height: 40px;
+}
+
+.field-config-row.ui-sortable-handle {
+	cursor: move;
 }
 
 textarea[name="profootball_custom_css"] {

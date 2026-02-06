@@ -169,7 +169,8 @@ if ( empty( $sections ) ) {
 			<div class="profootball-form-section">
 				<h4><?php echo esc_html( $section['title'] ); ?></h4>
 				
-				<?php if ( ! empty( $section['fields'] ) ) : ?>
+				<div class="profootball-grid-row">
+					<?php if ( ! empty( $section['fields'] ) ) : ?>
 					<?php foreach ( $section['fields'] as $field ) : 
 						$mapping = ! empty( $field['mapping'] ) ? $field['mapping'] : '';
 						// We show the field even if not mapped, but mapping is recommended for sync
@@ -180,104 +181,113 @@ if ( empty( $sections ) ) {
 						$value = get_user_meta( $user_id, $mapping, true );
 						$is_taxonomy = ( strpos( $mapping, 'tax_' ) === 0 );
 						$taxonomy = $is_taxonomy ? substr( $mapping, 4 ) : '';
+						
+						$col_width = ! empty( $field['width'] ) ? $field['width'] : '12';
+						$css_class = ! empty( $field['css_class'] ) ? $field['css_class'] : '';
+						$css_id = ! empty( $field['css_id'] ) ? $field['css_id'] : '';
 						?>
-						<div class="profootball-form-field">
-							<label><?php echo esc_html( $field['label'] ); ?></label>
-							
-							<?php if ( $is_taxonomy && taxonomy_exists( $taxonomy ) ) : 
-								$terms = get_terms( array( 'taxonomy' => $taxonomy, 'hide_empty' => false ) );
-								// Get current terms for player if exists
-								$player_id = ( new ProFootball_Player_Profile() )->get_player_id_by_user( $user_id );
-								$current_terms = $player_id ? wp_get_object_terms( $player_id, $taxonomy, array( 'fields' => 'ids' ) ) : array();
-								?>
-								<select name="<?php echo esc_attr( $mapping ); ?>[]" multiple class="profootball-select2-style">
-									<?php foreach ( $terms as $term ) : ?>
-										<option value="<?php echo $term->term_id; ?>" <?php selected( in_array( $term->term_id, $current_terms ) ); ?>>
-											<?php echo esc_html( $term->name ); ?>
-										</option>
-									<?php endforeach; ?>
-								</select>
-								<p class="field-desc">Hold Ctrl (Cmd) to select multiple values.</p>
-
-							<?php elseif ( $field['type'] === 'textarea' ) : ?>
-								<textarea name="<?php echo esc_attr( $mapping ); ?>" rows="4"><?php echo esc_textarea( $value ); ?></textarea>
-							
-							<?php elseif ( $field['type'] === 'select' ) : ?>
-								<?php
-								$options = profootball_get_field_options( $field, $ump_fields_by_name );
-								$selected_value = is_array( $value ) ? reset( $value ) : $value;
-								?>
-								<select name="<?php echo esc_attr( $mapping ); ?>">
-									<option value="">-- Select --</option>
-									<?php foreach ( $options as $option ) : ?>
-										<option value="<?php echo esc_attr( $option['value'] ); ?>" <?php selected( (string) $selected_value, (string) $option['value'] ); ?>>
-											<?php echo esc_html( $option['label'] ); ?>
-										</option>
-									<?php endforeach; ?>
-								</select>
-
-							<?php elseif ( $field['type'] === 'multiselect' ) : ?>
-								<?php
-								$options = profootball_get_field_options( $field, $ump_fields_by_name );
-								$selected_values = is_array( $value ) ? $value : array_filter( array_map( 'trim', explode( ',', (string) $value ) ), 'strlen' );
-								$selected_values = array_map( 'strval', $selected_values );
-								?>
-								<select name="<?php echo esc_attr( $mapping ); ?>[]" multiple class="profootball-select2-style">
-									<?php foreach ( $options as $option ) : ?>
-										<option value="<?php echo esc_attr( $option['value'] ); ?>" <?php selected( in_array( (string) $option['value'], $selected_values, true ) ); ?>>
-											<?php echo esc_html( $option['label'] ); ?>
-										</option>
-									<?php endforeach; ?>
-								</select>
-								<p class="field-desc">Hold Ctrl (Cmd) to select multiple values.</p>
-
-							<?php elseif ( $field['type'] === 'video' ) : ?>
-								<input type="url" name="<?php echo esc_attr( $mapping ); ?>" value="<?php echo esc_attr( $value ); ?>" placeholder="https://www.youtube.com/watch?v=...">
-								<p class="field-desc">Paste the link to your video (YouTube, Vimeo, etc.).</p>
-
-							<?php elseif ( $field['type'] === 'nationality' ) : ?>
-								<select name="<?php echo esc_attr( $mapping ); ?>">
-									<option value="">-- Select Country --</option>
-									<?php 
-									$countries = profootball_get_countries();
-									foreach ( $countries as $code => $name ) : ?>
-										<option value="<?php echo esc_attr( $code ); ?>" <?php selected( strtolower( (string) $value ), strtolower( $code ) ); ?>>
-											<?php echo esc_html( $name ); ?>
-										</option>
-									<?php endforeach; ?>
-								</select>
-								<?php if ( $value ) : 
-									$custom_width = ! empty( $field['options'] ) ? trim( $field['options'] ) : '40px';
-									if ( is_numeric( $custom_width ) ) { $custom_width .= 'px'; }
-									?>
-									<div style="margin-top: 10px; display: flex; align-items: center; gap: 10px;">
-										<img src="https://flagcdn.com/w160/<?php echo esc_attr( strtolower($value) ); ?>.png" 
-											 onerror="this.style.display='none'" 
-											 class="country-flag" 
-											 style="width:<?php echo esc_attr($custom_width); ?>; height:auto;">
-										<span><?php echo esc_html( strtoupper($value) ); ?></span>
-									</div>
-								<?php endif; ?>
-
-							<?php elseif ( $field['type'] === 'file' || $field['type'] === 'image' ) : ?>
-								<div class="profootball-upload-container">
-									<input type="file" name="<?php echo esc_attr( $mapping ); ?>" class="profootball-file-input">
-									<?php if ( $value ) : 
-										$file_display = is_numeric($value) ? basename(wp_get_attachment_url($value)) : basename($value);
-										?>
-										<p class="current-file">
-											Current: <a href="<?php echo esc_url(is_numeric($value) ? wp_get_attachment_url($value) : $value); ?>" target="_blank"><strong><?php echo esc_html($file_display); ?></strong></a>
-										</p>
-									<?php endif; ?>
-								</div>
-								<p class="field-desc">Upload your <?php echo esc_html(strtolower($field['label'])); ?> directly from your device.</p>
-							
+						<div <?php echo $css_id ? 'id="'.esc_attr($css_id).'"' : ''; ?> class="profootball-grid-col col-<?php echo esc_attr($col_width); ?> profootball-field-item field-type-<?php echo esc_attr( $field['type'] ); ?> <?php echo esc_attr($css_class); ?>">
+							<?php if ( $field['type'] === 'empty_space' ) : ?>
+								<!-- Empty Space Placeholder -->
 							<?php else : ?>
-								<input type="text" name="<?php echo esc_attr( $mapping ); ?>" value="<?php echo esc_attr( $value ); ?>">
+								<label><?php echo esc_html( $field['label'] ); ?></label>
+								
+								<?php if ( $is_taxonomy && taxonomy_exists( $taxonomy ) ) : 
+									$terms = get_terms( array( 'taxonomy' => $taxonomy, 'hide_empty' => false ) );
+									// Get current terms for player if exists
+									$player_id = ( new ProFootball_Player_Profile() )->get_player_id_by_user( $user_id );
+									$current_terms = $player_id ? wp_get_object_terms( $player_id, $taxonomy, array( 'fields' => 'ids' ) ) : array();
+									?>
+									<select name="<?php echo esc_attr( $mapping ); ?>[]" multiple class="profootball-select2-style">
+										<?php foreach ( $terms as $term ) : ?>
+											<option value="<?php echo $term->term_id; ?>" <?php selected( in_array( $term->term_id, $current_terms ) ); ?>>
+												<?php echo esc_html( $term->name ); ?>
+											</option>
+										<?php endforeach; ?>
+									</select>
+									<p class="field-desc">Hold Ctrl (Cmd) to select multiple values.</p>
+
+								<?php elseif ( $field['type'] === 'textarea' ) : ?>
+									<textarea name="<?php echo esc_attr( $mapping ); ?>" rows="4"><?php echo esc_textarea( $value ); ?></textarea>
+								
+								<?php elseif ( $field['type'] === 'select' ) : ?>
+									<?php
+									$options = profootball_get_field_options( $field, $ump_fields_by_name );
+									$selected_value = is_array( $value ) ? reset( $value ) : $value;
+									?>
+									<select name="<?php echo esc_attr( $mapping ); ?>">
+										<option value="">-- Select --</option>
+										<?php foreach ( $options as $option ) : ?>
+											<option value="<?php echo esc_attr( $option['value'] ); ?>" <?php selected( (string) $selected_value, (string) $option['value'] ); ?>>
+												<?php echo esc_html( $option['label'] ); ?>
+											</option>
+										<?php endforeach; ?>
+									</select>
+
+								<?php elseif ( $field['type'] === 'multiselect' ) : ?>
+									<?php
+									$options = profootball_get_field_options( $field, $ump_fields_by_name );
+									$selected_values = is_array( $value ) ? $value : array_filter( array_map( 'trim', explode( ',', (string) $value ) ), 'strlen' );
+									$selected_values = array_map( 'strval', $selected_values );
+									?>
+									<select name="<?php echo esc_attr( $mapping ); ?>[]" multiple class="profootball-select2-style">
+										<?php foreach ( $options as $option ) : ?>
+											<option value="<?php echo esc_attr( $option['value'] ); ?>" <?php selected( in_array( (string) $option['value'], $selected_values, true ) ); ?>>
+												<?php echo esc_html( $option['label'] ); ?>
+											</option>
+										<?php endforeach; ?>
+									</select>
+									<p class="field-desc">Hold Ctrl (Cmd) to select multiple values.</p>
+
+								<?php elseif ( $field['type'] === 'video' ) : ?>
+									<input type="url" name="<?php echo esc_attr( $mapping ); ?>" value="<?php echo esc_attr( $value ); ?>" placeholder="https://www.youtube.com/watch?v=...">
+									<p class="field-desc">Paste the link to your video (YouTube, Vimeo, etc.).</p>
+
+								<?php elseif ( $field['type'] === 'nationality' ) : ?>
+									<select name="<?php echo esc_attr( $mapping ); ?>">
+										<option value="">-- Select Country --</option>
+										<?php 
+										$countries = profootball_get_countries();
+										foreach ( $countries as $code => $name ) : ?>
+											<option value="<?php echo esc_attr( $code ); ?>" <?php selected( strtolower( (string) $value ), strtolower( $code ) ); ?>>
+												<?php echo esc_html( $name ); ?>
+											</option>
+										<?php endforeach; ?>
+									</select>
+									<?php if ( $value ) : 
+										$custom_width = ! empty( $field['options'] ) ? trim( $field['options'] ) : '40px';
+										if ( is_numeric( $custom_width ) ) { $custom_width .= 'px'; }
+										?>
+										<div style="margin-top: 10px; display: flex; align-items: center; gap: 10px;">
+											<img src="https://flagcdn.com/w160/<?php echo esc_attr( strtolower($value) ); ?>.png" 
+												 onerror="this.style.display='none'" 
+												 class="country-flag" 
+												 style="width:<?php echo esc_attr($custom_width); ?>; height:auto;">
+											<span><?php echo esc_html( strtoupper($value) ); ?></span>
+										</div>
+									<?php endif; ?>
+
+								<?php elseif ( $field['type'] === 'file' || $field['type'] === 'image' ) : ?>
+									<div class="profootball-upload-container">
+										<input type="file" name="<?php echo esc_attr( $mapping ); ?>" class="profootball-file-input">
+										<?php if ( $value ) : 
+											$file_display = is_numeric($value) ? basename(wp_get_attachment_url($value)) : basename($value);
+											?>
+											<p class="current-file">
+												Current: <a href="<?php echo esc_url(is_numeric($value) ? wp_get_attachment_url($value) : $value); ?>" target="_blank"><strong><?php echo esc_html($file_display); ?></strong></a>
+											</p>
+										<?php endif; ?>
+									</div>
+									<p class="field-desc">Upload your <?php echo esc_html(strtolower($field['label'])); ?> directly from your device.</p>
+								
+								<?php else : ?>
+									<input type="text" name="<?php echo esc_attr( $mapping ); ?>" value="<?php echo esc_attr( $value ); ?>">
+								<?php endif; ?>
 							<?php endif; ?>
 						</div>
 					<?php endforeach; ?>
 				<?php endif; ?>
+				</div>
 			</div>
 		<?php endforeach; ?>
 

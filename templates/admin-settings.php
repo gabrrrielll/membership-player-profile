@@ -103,26 +103,24 @@ function render_profootball_section_row( $index, $data ) {
 		
 		<div class="section-fields-container">
 			<!-- Fields inside this section -->
-			<table class="widefat field-table">
-				<thead>
-					<tr>
-						<th width="15%">Label</th>
-						<th width="12%">Type</th>
-						<th width="15%">Mapping (Slug)</th>
-						<th width="10%">Width</th>
-						<th width="15%">CSS Class/ID</th>
-						<th width="20%">Options</th>
-						<th width="5%">Action</th>
-					</tr>
-				</thead>
-				<tbody class="fields-list">
-					<?php if ( ! empty( $fields ) ) : ?>
-						<?php foreach ( $fields as $f_index => $field ) : ?>
-							<?php render_profootball_field_row( $index, $f_index, $field ); ?>
-						<?php endforeach; ?>
-					<?php endif; ?>
-				</tbody>
-			</table>
+			<div class="profootball-admin-field-header">
+				<div class="header-col col-label">Label</div>
+				<div class="header-col col-type">Type</div>
+				<div class="header-col col-mapping">Mapping (Slug)</div>
+				<div class="header-col col-width">Width</div>
+				<div class="header-col col-css">CSS Class/ID</div>
+				<div class="header-col col-options">Options</div>
+				<div class="header-col col-action">Action</div>
+			</div>
+			
+			<div class="fields-list profootball-admin-grid">
+				<?php if ( ! empty( $fields ) ) : ?>
+					<?php foreach ( $fields as $f_index => $field ) : ?>
+						<?php render_profootball_field_row( $index, $f_index, $field ); ?>
+					<?php endforeach; ?>
+				<?php endif; ?>
+			</div>
+			
 			<div class="add-field-wrap">
 				<button type="button" class="add-new-field button">Add Field to Section</button>
 			</div>
@@ -142,72 +140,87 @@ function render_profootball_field_row( $s_index, $f_index, $field ) {
 	$show_download = isset( $field['show_download'] ) ? $field['show_download'] : '';
 	$options = isset( $field['options'] ) ? $field['options'] : '';
 	?>
-	<tr class="field-config-row">
-		<td>
-			<input type="text" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][label]" value="<?php echo esc_attr( $label ); ?>" placeholder="Label" class="field-label-preview">
-		</td>
-		<td>
-			<select name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][type]" class="field-type-select">
-				<option value="text" <?php selected( $type, 'text' ); ?>>Input Text</option>
-				<option value="textarea" <?php selected( $type, 'textarea' ); ?>>Textarea / Editor</option>
-				<option value="select" <?php selected( $type, 'select' ); ?>>Select (Dropdown)</option>
-				<option value="multiselect" <?php selected( $type, 'multiselect' ); ?>>Select (Multiple)</option>
-				<option value="image" <?php selected( $type, 'image' ); ?>>Single Image</option>
-				<option value="gallery" <?php selected( $type, 'gallery' ); ?>>Gallery Slider</option>
-				<option value="video" <?php selected( $type, 'video' ); ?>>Video Link</option>
-				<option value="file" <?php selected( $type, 'file' ); ?>>File (CV)</option>
-				<option value="empty_space" <?php selected( $type, 'empty_space' ); ?>>Empty Space</option>
-				<option value="nationality" <?php selected( $type, 'nationality' ); ?>>Nationality (Flag)</option>
-			</select>
-		</td>
-		<td>
-			<select name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][mapping]" class="ump-mapping-select">
-				<option value="">-- Select --</option>
-				<optgroup label="Ultimate Membership Pro">
-					<?php if ( ! empty( $ump_fields ) ) : ?>
-						<?php foreach ( $ump_fields as $u_field ) : 
-							if ( empty( $u_field['name'] ) ) continue;
-							$f_label = ! empty( $u_field['label'] ) ? $u_field['label'] : $u_field['name'];
-							?>
-							<option value="<?php echo esc_attr( $u_field['name'] ); ?>" <?php selected( $mapping, $u_field['name'] ); ?>><?php echo esc_html( $f_label ); ?></option>
-						<?php endforeach; ?>
-					<?php endif; ?>
-				</optgroup>
-				<optgroup label="SportsPress">
-					<?php if ( ! empty( $sp_fields ) ) : ?>
-						<?php foreach ( $sp_fields as $sp_f ) : ?>
-							<option value="<?php echo esc_attr( $sp_f['name'] ); ?>" <?php selected( $mapping, $sp_f['name'] ); ?>><?php echo esc_html( $sp_f['label'] ); ?></option>
-						<?php endforeach; ?>
-					<?php endif; ?>
-				</optgroup>
-			</select>
-		</td>
-		<td>
-			<select name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][width]" class="field-width-select">
-				<option value="12" <?php selected( $width, '12' ); ?>>100% (Full)</option>
-				<option value="6" <?php selected( $width, '6' ); ?>>50% (1/2)</option>
-				<option value="4" <?php selected( $width, '4' ); ?>>33% (1/3)</option>
-				<option value="3" <?php selected( $width, '3' ); ?>>25% (1/4)</option>
-				<option value="8" <?php selected( $width, '8' ); ?>>66% (2/3)</option>
-			</select>
-		</td>
-		<td>
-			<input type="text" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][css_class]" value="<?php echo esc_attr( $css_class ); ?>" placeholder="Class" style="width:45%;">
-			<input type="text" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][css_id]" value="<?php echo esc_attr( $css_id ); ?>" placeholder="ID" style="width:45%;">
-		</td>
-		<td>
-			<div class="field-options-wrap" <?php echo ( in_array( $type, array( 'select', 'multiselect', 'nationality' ) ) ) ? '' : 'style="display:none;"'; ?>>
-				<textarea name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][options]" rows="3" placeholder="<?php echo $type === 'nationality' ? 'e.g. 100px or 120px' : 'Option 1|Option 2, Option 3'; ?>"><?php echo esc_textarea( $options ); ?></textarea>
-				<small><?php echo $type === 'nationality' ? 'Enter flag width (e.g. 100px). Default is 40px.' : 'Use commas or new lines. "value|label" supported.'; ?></small>
+	<div class="field-config-row profootball-admin-grid-col col-<?php echo esc_attr($width); ?>">
+		<div class="field-config-inner">
+			<div class="field-config-main">
+				<div class="field-input-group">
+					<label class="admin-field-label">Label</label>
+					<input type="text" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][label]" value="<?php echo esc_attr( $label ); ?>" placeholder="Label" class="field-label-preview">
+				</div>
+				
+				<div class="field-input-group">
+					<label class="admin-field-label">Type</label>
+					<select name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][type]" class="field-type-select">
+						<option value="text" <?php selected( $type, 'text' ); ?>>Input Text</option>
+						<option value="textarea" <?php selected( $type, 'textarea' ); ?>>Textarea / Editor</option>
+						<option value="select" <?php selected( $type, 'select' ); ?>>Select (Dropdown)</option>
+						<option value="multiselect" <?php selected( $type, 'multiselect' ); ?>>Select (Multiple)</option>
+						<option value="image" <?php selected( $type, 'image' ); ?>>Single Image</option>
+						<option value="gallery" <?php selected( $type, 'gallery' ); ?>>Gallery Slider</option>
+						<option value="video" <?php selected( $type, 'video' ); ?>>Video Link</option>
+						<option value="file" <?php selected( $type, 'file' ); ?>>File (CV)</option>
+						<option value="empty_space" <?php selected( $type, 'empty_space' ); ?>>Empty Space</option>
+						<option value="nationality" <?php selected( $type, 'nationality' ); ?>>Nationality (Flag)</option>
+					</select>
+				</div>
+				
+				<div class="field-input-group">
+					<label class="admin-field-label">Mapping</label>
+					<select name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][mapping]" class="ump-mapping-select">
+						<option value="">-- Select --</option>
+						<optgroup label="Ultimate Membership Pro">
+							<?php if ( ! empty( $ump_fields ) ) : ?>
+								<?php foreach ( $ump_fields as $u_field ) : 
+									if ( empty( $u_field['name'] ) ) continue;
+									$f_label = ! empty( $u_field['label'] ) ? $u_field['label'] : $u_field['name'];
+									?>
+									<option value="<?php echo esc_attr( $u_field['name'] ); ?>" <?php selected( $mapping, $u_field['name'] ); ?>><?php echo esc_html( $f_label ); ?></option>
+								<?php endforeach; ?>
+							<?php endif; ?>
+						</optgroup>
+						<optgroup label="SportsPress">
+							<?php if ( ! empty( $sp_fields ) ) : ?>
+								<?php foreach ( $sp_fields as $sp_f ) : ?>
+									<option value="<?php echo esc_attr( $sp_f['name'] ); ?>" <?php selected( $mapping, $sp_f['name'] ); ?>><?php echo esc_html( $sp_f['label'] ); ?></option>
+								<?php endforeach; ?>
+							<?php endif; ?>
+						</optgroup>
+					</select>
+				</div>
+				
+				<div class="field-input-group">
+					<label class="admin-field-label">Width</label>
+					<select name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][width]" class="field-width-select">
+						<option value="12" <?php selected( $width, '12' ); ?>>100% (Full)</option>
+						<option value="6" <?php selected( $width, '6' ); ?>>50% (1/2)</option>
+						<option value="4" <?php selected( $width, '4' ); ?>>33% (1/3)</option>
+						<option value="3" <?php selected( $width, '3' ); ?>>25% (1/4)</option>
+						<option value="8" <?php selected( $width, '8' ); ?>>66% (2/3)</option>
+					</select>
+				</div>
+
+				<div class="field-input-group">
+					<label class="admin-field-label">CSS Class/ID</label>
+					<div style="display:flex; gap:5px;">
+						<input type="text" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][css_class]" value="<?php echo esc_attr( $css_class ); ?>" placeholder="Class" style="flex:1;">
+						<input type="text" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][css_id]" value="<?php echo esc_attr( $css_id ); ?>" placeholder="ID" style="flex:1;">
+					</div>
+				</div>
 			</div>
-			<div class="download-toggle-wrap" <?php echo ( $type === 'file' || $type === 'image' ) ? '' : 'style="display:none;"'; ?>>
-				<label><input type="checkbox" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][show_download]" value="1" <?php checked( $show_download, '1' ); ?>> Download</label>
+
+			<div class="field-config-extra">
+				<div class="field-options-wrap" <?php echo ( in_array( $type, array( 'select', 'multiselect', 'nationality' ) ) ) ? '' : 'style="display:none;"'; ?>>
+					<label class="admin-field-label">Options</label>
+					<textarea name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][options]" rows="2" placeholder="<?php echo $type === 'nationality' ? 'e.g. 100px or 120px' : 'Option 1|Option 2, Option 3'; ?>"><?php echo esc_textarea( $options ); ?></textarea>
+					<small><?php echo $type === 'nationality' ? 'Enter flag width.' : '"value|label" supported.'; ?></small>
+				</div>
+				<div class="download-toggle-wrap" <?php echo ( $type === 'file' || $type === 'image' ) ? '' : 'style="display:none;"'; ?>>
+					<label><input type="checkbox" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][show_download]" value="1" <?php checked( $show_download, '1' ); ?>> Download</label>
+				</div>
+				<button type="button" class="remove-field button-link-delete">Remove Field</button>
 			</div>
-		</td>
-		<td>
-			<button type="button" class="remove-field button-link-delete">Del</button>
-		</td>
-	</tr>
+		</div>
+	</div>
 	<?php
 }
 ?>

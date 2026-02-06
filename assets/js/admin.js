@@ -13,7 +13,7 @@ jQuery(document).ready(function ($) {
     // Make fields sortable within sections
     function initFieldSortable() {
         $('.fields-list').sortable({
-            items: 'tr',
+            items: '.field-config-row',
             placeholder: 'sortable-placeholder',
             update: function () {
                 reindexAll();
@@ -55,13 +55,14 @@ jQuery(document).ready(function ($) {
 
     // Remove Field
     $(document).on('click', '.remove-field', function () {
-        $(this).closest('tr').remove();
+        $(this).closest('.field-config-row').remove();
+        updateLayoutPreview();
     });
 
     // Toggle Download Checkbox based on type
     $(document).on('change', '.field-type-select', function () {
         var type = $(this).val();
-        var $row = $(this).closest('tr');
+        var $row = $(this).closest('.field-config-row');
         if (type === 'file' || type === 'image') {
             $row.find('.download-toggle-wrap').fadeIn();
         } else {
@@ -87,6 +88,15 @@ jQuery(document).ready(function ($) {
 
     // Update preview on any change
     $(document).on('input change', '.section-title-input, .field-label-preview, .field-width-select', function () {
+        if ($(this).hasClass('field-width-select')) {
+            var width = $(this).val();
+            var $row = $(this).closest('.field-config-row');
+            // Remove old col classes
+            $row.removeClass(function (index, className) {
+                return (className.match(/(^|\s)col-\S+/g) || []).join(' ');
+            });
+            $row.addClass('col-' + width);
+        }
         updateLayoutPreview();
     });
 
@@ -105,7 +115,7 @@ jQuery(document).ready(function ($) {
             var sectionTitle = $(this).find('.section-title-input').val() || 'Untitled Section';
             var $sectionBox = $('<div class="preview-section"><div class="preview-section-title">' + sectionTitle + '</div><div class="preview-row"></div></div>');
 
-            $(this).find('.fields-list tr').each(function () {
+            $(this).find('.fields-list .field-config-row').each(function () {
                 var label = $(this).find('.field-label-preview').val() || 'Field';
                 var width = $(this).find('.field-width-select').val() || '12';
                 var type = $(this).find('.field-type-select').val();
@@ -130,12 +140,11 @@ jQuery(document).ready(function ($) {
             $(this).find('.section-title-input').attr('name', 'profootball_player_sections[' + s_idx + '][title]');
 
             // Update all fields in this section
-            $(this).find('.fields-list tr').each(function (f_idx) {
+            $(this).find('.fields-list .field-config-row').each(function (f_idx) {
                 $(this).find('input, select, textarea').each(function () {
                     var name = $(this).attr('name');
                     if (name) {
                         // Replace BOTH indices: section index and field index
-                        // Name format: profootball_player_sections[OLD_S_IDX][fields][OLD_F_IDX][property]
                         var newName = name.replace(/profootball_player_sections\[\d+\]\[fields\]\[\d+\]/, 'profootball_player_sections[' + s_idx + '][fields][' + f_idx + ']');
                         $(this).attr('name', newName);
                     }
