@@ -138,13 +138,18 @@ class ProFootball_Player_Profile {
 				}
 
 				// Handle File/Image uploads separately
-				if ( ( $field['type'] === 'file' || $field['type'] === 'image' ) && ! empty( $_FILES[ $mapping ]['name'] ) ) {
-					// Upload the file
-					$attachment_id = media_handle_upload( $mapping, 0 );
-					if ( ! is_wp_error( $attachment_id ) ) {
-						update_user_meta( $user_id, $mapping, $attachment_id );
-						$value = $attachment_id;
+				if ( ( $field['type'] === 'file' || $field['type'] === 'image' ) ) {
+					if ( ! empty( $_FILES[ $mapping ]['name'] ) ) {
+						// Upload the file
+						$attachment_id = media_handle_upload( $mapping, 0 );
+						if ( ! is_wp_error( $attachment_id ) ) {
+							update_user_meta( $user_id, $mapping, $attachment_id );
+							$value = $attachment_id;
+						} else {
+							$value = get_user_meta( $user_id, $mapping, true );
+						}
 					} else {
+						// Preserve existing value if no new file uploaded
 						$value = get_user_meta( $user_id, $mapping, true );
 					}
 				} else {

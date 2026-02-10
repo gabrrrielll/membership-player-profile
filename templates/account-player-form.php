@@ -242,6 +242,11 @@ if ( empty( $sections ) ) {
 								<?php elseif ( $field['type'] === 'video' ) : ?>
 									<input type="url" name="<?php echo esc_attr( $mapping ); ?>" value="<?php echo esc_attr( $value ); ?>" placeholder="https://www.youtube.com/watch?v=...">
 									<p class="field-desc">Paste the link to your video (YouTube, Vimeo, etc.).</p>
+								
+								<?php elseif ( $field['type'] === 'shortcut_buttons' ) : ?>
+									<div class="profootball-shortcuts-edit-notice">
+										<p><em>Shortcut buttons will be displayed on the public profile.</em></p>
+									</div>
 
 								<?php elseif ( $field['type'] === 'nationality' ) : ?>
 									<select name="<?php echo esc_attr( $mapping ); ?>">

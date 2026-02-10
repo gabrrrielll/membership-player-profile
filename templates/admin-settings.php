@@ -138,6 +138,7 @@ function render_profootball_field_row( $s_index, $f_index, $field ) {
 	$css_class = isset( $field['css_class'] ) ? $field['css_class'] : '';
 	$css_id = isset( $field['css_id'] ) ? $field['css_id'] : '';
 	$show_download = isset( $field['show_download'] ) ? $field['show_download'] : '';
+	$download_text = isset( $field['download_text'] ) ? $field['download_text'] : '';
 	$options = isset( $field['options'] ) ? $field['options'] : '';
 	?>
 	<div class="field-config-row profootball-admin-grid-col col-<?php echo esc_attr($width); ?>">
@@ -159,8 +160,9 @@ function render_profootball_field_row( $s_index, $f_index, $field ) {
 						<option value="gallery" <?php selected( $type, 'gallery' ); ?>>Gallery Slider</option>
 						<option value="video" <?php selected( $type, 'video' ); ?>>Video Link</option>
 						<option value="file" <?php selected( $type, 'file' ); ?>>File (CV)</option>
-						<option value="empty_space" <?php selected( $type, 'empty_space' ); ?>>Empty Space</option>
+						<option value="empty_space" <?php selected( $type, 'empty_space' ); ?>>Empty Space Placeholder</option>
 						<option value="nationality" <?php selected( $type, 'nationality' ); ?>>Nationality (Flag)</option>
+						<option value="shortcut_buttons" <?php selected( $type, 'shortcut_buttons' ); ?>>Shortcut Buttons (Vertical Nav)</option>
 					</select>
 				</div>
 				
@@ -216,6 +218,9 @@ function render_profootball_field_row( $s_index, $f_index, $field ) {
 				</div>
 				<div class="download-toggle-wrap" <?php echo ( $type === 'file' || $type === 'image' ) ? '' : 'style="display:none;"'; ?>>
 					<label><input type="checkbox" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][show_download]" value="1" <?php checked( $show_download, '1' ); ?>> Download</label>
+					<div class="download-text-wrap" <?php echo ( $show_download === '1' ) ? '' : 'style="display:none;"'; ?> style="margin-top: 5px;">
+						<input type="text" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][download_text]" value="<?php echo esc_attr( $download_text ); ?>" placeholder="Button Text (e.g. Download CV)">
+					</div>
 				</div>
 				<button type="button" class="remove-field button-link-delete">Remove Field</button>
 			</div>

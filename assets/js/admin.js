@@ -59,6 +59,15 @@ jQuery(document).ready(function ($) {
         updateLayoutPreview();
     });
 
+    // Toggle Download Text based on checkbox
+    $(document).on('change', '.download-toggle-wrap input[type="checkbox"]', function () {
+        if ($(this).is(':checked')) {
+            $(this).closest('.download-toggle-wrap').find('.download-text-wrap').fadeIn();
+        } else {
+            $(this).closest('.download-toggle-wrap').find('.download-text-wrap').fadeOut();
+        }
+    });
+
     // Toggle Download Checkbox based on type
     $(document).on('change', '.field-type-select', function () {
         var type = $(this).val();
@@ -67,6 +76,12 @@ jQuery(document).ready(function ($) {
             $row.find('.download-toggle-wrap').fadeIn();
         } else {
             $row.find('.download-toggle-wrap').fadeOut();
+        }
+
+        if (type === 'shortcut_buttons') {
+            $row.find('.field-label-preview').val('Shortcuts');
+            $row.find('.field-width-select').val('12').trigger('change');
+            $row.find('.ump-mapping-select').val('').trigger('change');
         }
 
         if (type === 'select' || type === 'multiselect' || type === 'nationality') {

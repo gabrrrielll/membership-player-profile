@@ -42,16 +42,8 @@ if ( is_user_logged_in() ) {
 ?>
 <div class="profootball-profile-container">
     
-    <!-- Dynamic Navigation Buttons -->
-    <?php if ( ! empty( $sections ) ) : ?>
-    <nav class="profootball-anchor-nav">
-        <?php foreach ( $sections as $index => $section ) : 
-            $safe_id = 'section-' . sanitize_title( $section['title'] );
-            ?>
-            <a href="#<?php echo $safe_id; ?>" class="profootball-anchor-button"><?php echo esc_html( $section['title'] ); ?></a>
-        <?php endforeach; ?>
-    </nav>
-    <?php endif; ?>
+    <!-- Navigation Buttons will now be handled as a positionable field from admin -->
+
 
     <!-- Player Header -->
     <div class="profootball-header-card">
@@ -101,7 +93,8 @@ if ( is_user_logged_in() ) {
                     <?php endif; ?>
                 </div>
 
-                <!-- Navigation Buttons (Anchor links) -->
+                <!-- Navigation mini-buttons can be kept or removed based on preference. 
+                     Keeping current logic for header mini-nav if sections exist. -->
                 <?php if ( ! empty( $sections ) ) : ?>
                 <nav class="profootball-anchor-nav-inline">
                     <?php foreach ( $sections as $index => $section ) : 
@@ -302,7 +295,8 @@ function render_profootball_public_field( $field, $value ) {
             $img_url = is_numeric( $value ) ? wp_get_attachment_url( $value ) : $value;
             echo '<img src="' . esc_url( $img_url ) . '" class="profootball-field-image">';
             if ( ! empty( $field['show_download'] ) && $field['show_download'] === '1' ) {
-                echo '<div class="profootball-download-wrap"><a href="' . esc_url( $img_url ) . '" class="profootball-download-link secondary" download>Download Image</a></div>';
+                $btn_text = ! empty( $field['download_text'] ) ? $field['download_text'] : 'Download Image';
+                echo '<div class="profootball-download-wrap"><a href="' . esc_url( $img_url ) . '" class="profootball-download-link secondary" download>' . esc_html( $btn_text ) . '</a></div>';
             }
             break;
         case 'gallery':
@@ -348,9 +342,21 @@ function render_profootball_public_field( $field, $value ) {
             $file_url = is_numeric( $value ) ? wp_get_attachment_url( $value ) : $value;
             $file_name = basename( $file_url );
             if ( ! empty( $field['show_download'] ) && $field['show_download'] === '1' ) {
-                echo '<a href="' . esc_url( $file_url ) . '" class="profootball-download-link" target="_blank" download>Download ' . esc_html( $field['label'] ) . ' (' . esc_html( $file_name ) . ')</a>';
+                $btn_text = ! empty( $field['download_text'] ) ? $field['download_text'] : 'Download ' . $field['label'];
+                echo '<a href="' . esc_url( $file_url ) . '" class="profootball-download-link" target="_blank" download>' . esc_html( $btn_text ) . ' (' . esc_html( $file_name ) . ')</a>';
             } else {
                 echo '<span class="file-status">File Uploaded</span>'; 
+            }
+            break;
+        case 'shortcut_buttons':
+            $sections = get_option( 'profootball_player_sections', array() );
+            if ( ! empty( $sections ) ) {
+                echo '<nav class="profootball-anchor-nav">';
+                foreach ( $sections as $s ) {
+                    $safe_id = 'section-' . sanitize_title( $s['title'] );
+                    echo '<a href="#' . $safe_id . '" class="profootball-anchor-button">' . esc_html( $s['title'] ) . '</a>';
+                }
+                echo '</nav>';
             }
             break;
         case 'text':
