@@ -96,6 +96,8 @@
     flex-direction: column;
     gap: 10px;
     margin-bottom: 40px;
+    align-items: stretch;
+    width: 100%;
 }
 
 .profootball-anchor-button {
@@ -111,9 +113,9 @@
     transition: all 0.3s ease;
     border: none;
     cursor: pointer;
-    display: inline-block;
-    width: fit-content;
-    min-width: 200px;
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .profootball-anchor-button:hover {
