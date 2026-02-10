@@ -147,8 +147,11 @@ if ( is_user_logged_in() ) {
                                     ?>
                                     
                                     <div <?php echo $css_id ? 'id="'.esc_attr($css_id).'"' : ''; ?> class="profootball-grid-col col-<?php echo esc_attr($col_width); ?> profootball-field-item field-type-<?php echo esc_attr( $field['type'] ); ?> <?php echo esc_attr($css_class); ?>">
-                                        <?php if ( $field['type'] !== 'empty_space' ) : ?>
+                                        <?php if ( ! in_array( $field['type'], array( 'empty_space', 'shortcut_buttons' ) ) ) : ?>
                                             <span class="field-label"><?php echo esc_html( $field['label'] ); ?></span>
+                                        <?php endif; ?>
+
+                                        <?php if ( $field['type'] !== 'empty_space' ) : ?>
                                             <div class="field-content">
                                                 <!-- Debug: User: <?php echo $user_id; ?>, Mapping: <?php echo $mapping; ?> -->
                                                 <?php render_profootball_public_field( $field, $value ); ?>
@@ -234,7 +237,7 @@ function profootball_build_options_map( $raw_options ) {
 }
 
 function render_profootball_public_field( $field, $value ) {
-    if ( empty( $value ) ) {
+    if ( empty( $value ) && $field['type'] !== 'shortcut_buttons' ) {
         echo '<span class="empty-field">N/A</span>';
         return;
     }
