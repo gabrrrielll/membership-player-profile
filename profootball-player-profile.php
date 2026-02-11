@@ -131,10 +131,11 @@ class ProFootball_Player_Profile {
 		foreach ( $sections as $section ) {
 			if ( empty( $section['fields'] ) ) continue;
 
-			foreach ( $section['fields'] as $field ) {
+			foreach ( $section['fields'] as $f_index => $field ) {
 				$mapping = ! empty( $field['mapping'] ) ? $field['mapping'] : '';
 				if ( empty( $mapping ) ) {
-					$mapping = 'unmapped_field_' . sanitize_title( $field['label'] );
+					$mapping_suffix = ! empty( $field['label'] ) ? sanitize_title( $field['label'] ) : $f_index;
+					$mapping = 'unmapped_field_' . $mapping_suffix;
 				}
 
 				// Handle File/Image uploads separately

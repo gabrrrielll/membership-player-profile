@@ -171,11 +171,12 @@ if ( empty( $sections ) ) {
 				
 				<div class="profootball-grid-row">
 					<?php if ( ! empty( $section['fields'] ) ) : ?>
-					<?php foreach ( $section['fields'] as $field ) : 
+					<?php foreach ( $section['fields'] as $f_index => $field ) : 
 						$mapping = ! empty( $field['mapping'] ) ? $field['mapping'] : '';
 						// We show the field even if not mapped, but mapping is recommended for sync
 						if ( empty( $mapping ) ) {
-							$mapping = 'unmapped_field_' . sanitize_title( $field['label'] );
+							$mapping_suffix = ! empty( $field['label'] ) ? sanitize_title( $field['label'] ) : $f_index;
+							$mapping = 'unmapped_field_' . $mapping_suffix;
 						}
 						
 						$value = get_user_meta( $user_id, $mapping, true );
@@ -190,7 +191,9 @@ if ( empty( $sections ) ) {
 							<?php if ( $field['type'] === 'empty_space' ) : ?>
 								<!-- Empty Space Placeholder -->
 							<?php else : ?>
-								<label><?php echo esc_html( $field['label'] ); ?></label>
+								<?php if ( ! empty( $field['label'] ) ) : ?>
+									<label><?php echo esc_html( $field['label'] ); ?></label>
+								<?php endif; ?>
 								
 								<?php if ( $is_taxonomy && taxonomy_exists( $taxonomy ) ) : 
 									$terms = get_terms( array( 'taxonomy' => $taxonomy, 'hide_empty' => false ) );
