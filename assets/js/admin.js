@@ -91,9 +91,11 @@ jQuery(document).ready(function ($) {
             if (type === 'nationality') {
                 $textarea.attr('placeholder', 'e.g. 100px or 120px');
                 $small.text('Enter flag width (e.g. 100px). Default is 40px.');
+                $row.find('.nat-name-toggle-wrap').fadeIn();
             } else {
                 $textarea.attr('placeholder', 'Option 1|Option 2, Option 3');
                 $small.text('Use commas or new lines. "value|label" supported.');
+                $row.find('.nat-name-toggle-wrap').fadeOut();
             }
         } else {
             $row.find('.field-options-wrap').fadeOut();

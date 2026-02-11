@@ -215,6 +215,11 @@ function render_profootball_field_row( $s_index, $f_index, $field ) {
 					<label class="admin-field-label">Options</label>
 					<textarea name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][options]" rows="2" placeholder="<?php echo $type === 'nationality' ? 'e.g. 100px or 120px' : 'Option 1|Option 2, Option 3'; ?>"><?php echo esc_textarea( $options ); ?></textarea>
 					<small><?php echo $type === 'nationality' ? 'Enter flag width.' : '"value|label" supported.'; ?></small>
+					
+					<div class="nat-name-toggle-wrap" style="<?php echo ( $type === 'nationality' ) ? 'margin-top: 10px;' : 'display:none; margin-top: 10px;'; ?>">
+						<?php $show_nat_name = isset( $field['show_nat_name'] ) ? $field['show_nat_name'] : '1'; ?>
+						<label><input type="checkbox" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][show_nat_name]" value="1" <?php checked( $show_nat_name, '1' ); ?>> Show Nationality Name</label>
+					</div>
 				</div>
 				<div class="download-toggle-wrap" <?php echo ( $type === 'file' || $type === 'image' ) ? '' : 'style="display:none;"'; ?>>
 					<label><input type="checkbox" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][show_download]" value="1" <?php checked( $show_download, '1' ); ?>> Download</label>

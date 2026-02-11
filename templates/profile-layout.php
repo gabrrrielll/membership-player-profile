@@ -122,14 +122,15 @@ if ( is_user_logged_in() ) {
                     <div class="section-body">
                         <div class="profootball-grid-row">
                             <?php if ( ! empty( $section['fields'] ) ) : ?>
-                                <?php foreach ( $section['fields'] as $field ) : ?>
+                                <?php foreach ( $section['fields'] as $f_index => $field ) : ?>
                                     <?php 
                                     // Fetch data from UMP mapping
                                     $value = '';
                                     if ( $user_id ) {
                                         $mapping = ! empty( $field['mapping'] ) ? $field['mapping'] : '';
                                         if ( empty( $mapping ) ) {
-                                            $mapping = 'unmapped_field_' . sanitize_title( $field['label'] );
+                                            $mapping_suffix = ! empty( $field['label'] ) ? sanitize_title( $field['label'] ) : $f_index;
+                                            $mapping = 'unmapped_field_' . $mapping_suffix;
                                             $field['mapping'] = $mapping; // Ensure the render function sees the mapping
                                         }
                                         $value = get_user_meta( $user_id, $mapping, true );
@@ -147,7 +148,7 @@ if ( is_user_logged_in() ) {
                                     ?>
                                     
                                     <div <?php echo $css_id ? 'id="'.esc_attr($css_id).'"' : ''; ?> class="profootball-grid-col col-<?php echo esc_attr($col_width); ?> profootball-field-item field-type-<?php echo esc_attr( $field['type'] ); ?> <?php echo esc_attr($css_class); ?>">
-                                        <?php if ( ! in_array( $field['type'], array( 'empty_space', 'shortcut_buttons' ) ) ) : ?>
+                                        <?php if ( ! empty( $field['label'] ) && ! in_array( $field['type'], array( 'empty_space', 'shortcut_buttons' ) ) ) : ?>
                                             <span class="field-label"><?php echo esc_html( $field['label'] ); ?></span>
                                         <?php endif; ?>
 
@@ -328,6 +329,8 @@ function render_profootball_public_field( $field, $value ) {
         case 'nationality':
             $country_code = strtolower( trim( $value ) );
             $custom_width = ! empty( $field['options'] ) ? trim( $field['options'] ) : '40px';
+            $show_nat_name = isset( $field['show_nat_name'] ) ? $field['show_nat_name'] : '1';
+
             // Ensure width has a unit if it's just a number
             if ( is_numeric( $custom_width ) ) {
                 $custom_width .= 'px';
@@ -338,7 +341,9 @@ function render_profootball_public_field( $field, $value ) {
                        onerror="this.style.display=\'none\'" 
                        class="country-flag" 
                        style="width:' . esc_attr( $custom_width ) . '; height:auto; vertical-align:middle;">';
-            echo ' ' . esc_html( strtoupper( $value ) );
+            if ( $show_nat_name === '1' ) {
+                echo ' ' . esc_html( strtoupper( $value ) );
+            }
             echo '</div>';
             break;
         case 'file':
