@@ -145,6 +145,11 @@ if ( is_user_logged_in() ) {
                                     $col_width = ! empty( $field['width'] ) ? $field['width'] : '12';
                                     $css_id = ! empty( $field['css_id'] ) ? $field['css_id'] : '';
                                     $css_class = ! empty( $field['css_class'] ) ? $field['css_class'] : '';
+                                    
+                                    // Label Position
+                                    if ( ! empty( $field['label_pos'] ) && $field['label_pos'] === 'left' ) {
+                                        $css_class .= ' profootball-label-left';
+                                    }
                                     ?>
                                     
                                     <div <?php echo $css_id ? 'id="'.esc_attr($css_id).'"' : ''; ?> class="profootball-grid-col col-<?php echo esc_attr($col_width); ?> profootball-field-item field-type-<?php echo esc_attr( $field['type'] ); ?> <?php echo esc_attr($css_class); ?>">

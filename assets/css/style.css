@@ -281,3 +281,37 @@
         width: 100% !important;
     }
 }
+
+/* Label Position: Left */
+.profootball-label-left {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.profootball-label-left .field-label {
+    margin-bottom: 0;
+    margin-right: 20px;
+    min-width: 150px;
+    flex-shrink: 0;
+}
+
+.profootball-label-left .field-content {
+    flex-grow: 1;
+    text-align: right;
+}
+
+@media (max-width: 768px) {
+    .profootball-label-left {
+        display: block;
+    }
+
+    .profootball-label-left .field-label {
+        margin-bottom: 5px;
+        margin-right: 0;
+    }
+
+    .profootball-label-left .field-content {
+        text-align: left;
+    }
+}

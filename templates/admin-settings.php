@@ -98,10 +98,14 @@ function render_profootball_section_row( $index, $data ) {
 		<div class="section-header">
 			<span class="dashicons dashicons-move handle"></span>
 			<input type="text" name="profootball_player_sections[<?php echo $index; ?>][title]" value="<?php echo esc_attr( $title ); ?>" placeholder="Section Title (e.g. Player CV)" class="section-title-input">
-			<button type="button" class="remove-section button-link-delete">Remove Section</button>
+			<div class="section-controls">
+				<button type="button" class="add-new-field button button-small">Add Field</button>
+				<button type="button" class="toggle-section button button-small"><span class="dashicons dashicons-arrow-down-alt2"></span></button>
+				<button type="button" class="remove-section button-link-delete">Remove</button>
+			</div>
 		</div>
 		
-		<div class="section-fields-container">
+		<div class="section-fields-container" style="display:none;">
 			<!-- Fields inside this section -->
 			<div class="profootball-admin-field-header">
 				<div class="header-col col-label">Label</div>
@@ -121,9 +125,9 @@ function render_profootball_section_row( $index, $data ) {
 				<?php endif; ?>
 			</div>
 			
-			<div class="add-field-wrap">
-				<button type="button" class="add-new-field button">Add Field to Section</button>
 			</div>
+			<!-- Add Field button moved to header -->
+		</div>
 		</div>
 	</div>
 	<?php
@@ -140,6 +144,7 @@ function render_profootball_field_row( $s_index, $f_index, $field ) {
 	$show_download = isset( $field['show_download'] ) ? $field['show_download'] : '';
 	$download_text = isset( $field['download_text'] ) ? $field['download_text'] : '';
 	$options = isset( $field['options'] ) ? $field['options'] : '';
+	$label_pos = isset( $field['label_pos'] ) ? $field['label_pos'] : ''; // '' (top) or 'left'
 	?>
 	<div class="field-config-row profootball-admin-grid-col col-<?php echo esc_attr($width); ?>">
 		<div class="field-config-inner">
@@ -147,6 +152,10 @@ function render_profootball_field_row( $s_index, $f_index, $field ) {
 				<div class="field-input-group">
 					<label class="admin-field-label">Label</label>
 					<input type="text" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][label]" value="<?php echo esc_attr( $label ); ?>" placeholder="Label" class="field-label-preview">
+					<label style="margin-top:5px; display:block; font-weight:normal;">
+						<input type="checkbox" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][label_pos]" value="left" <?php checked( $label_pos, 'left' ); ?>>
+						Display Label on Left
+					</label>
 				</div>
 				
 				<div class="field-input-group">

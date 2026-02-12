@@ -122,14 +122,25 @@
 	padding-top: 20px;
 }
 
+.section-controls {
+	display: flex;
+	gap: 10px;
+	align-items: center;
+	margin-left: 15px;
+}
+
 .remove-section {
 	color: #ef4444 !important;
 	text-decoration: none;
 	font-size: 0.9em;
 }
 
-.remove-section:hover {
-	color: #dc2626 !important;
+.toggle-section .dashicons {
+	transition: transform 0.2s;
+}
+
+.profootball-section-item.open .toggle-section .dashicons {
+	transform: rotate(180deg);
 }
 
 .profootball-help-icon {
@@ -234,8 +245,8 @@
 }
 
 .field-config-main {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
+	display: flex;
+	flex-direction: column;
 	gap: 10px;
 }
 
@@ -340,6 +351,15 @@
 	cursor: move;
 }
 
+.sortable-placeholder {
+	background: #f0f0f1;
+	border: 2px dashed #ccc;
+	border-radius: 4px;
+	margin-bottom: 10px;
+	height: 100px;
+	width: 100%;
+}
+
 textarea[name="profootball_custom_css"] {
 	border-radius: 4px;
 	padding: 15px;
@@ -347,4 +367,25 @@ textarea[name="profootball_custom_css"] {
 	line-height: 1.5;
 	border: 1px solid #cbd5e1;
 	margin-top: 10px;
+}
+
+/* Compact Admin to reduce size */
+.profootball-section-item {
+	margin-bottom: 10px;
+}
+
+.section-header {
+	padding: 8px 12px;
+}
+
+.section-fields-container {
+	padding: 10px;
+}
+
+.field-config-inner {
+	padding: 12px;
+}
+
+.field-input-group {
+	margin-bottom: 8px;
 }

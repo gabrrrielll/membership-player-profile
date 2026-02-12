@@ -33,10 +33,18 @@ jQuery(document).ready(function ($) {
         initFieldSortable();
     });
 
+    // Toggle Section Visibility
+    $(document).on('click', '.toggle-section', function () {
+        var $section = $(this).closest('.profootball-section-item');
+        $section.toggleClass('open');
+        $section.find('.section-fields-container').slideToggle();
+    });
+
     // Remove Section
     $(document).on('click', '.remove-section', function () {
         if (confirm('Are you sure you want to remove this section?')) {
             $(this).closest('.profootball-section-item').remove();
+            updateLayoutPreview();
         }
     });
 
@@ -51,6 +59,12 @@ jQuery(document).ready(function ($) {
         tpl = tpl.replace(/{{F_INDEX}}/g, f_index);
 
         $section.find('.fields-list').append(tpl);
+
+        // Open the section if closed
+        if (!$section.hasClass('open')) {
+            $section.addClass('open');
+            $section.find('.section-fields-container').slideDown();
+        }
     });
 
     // Remove Field
