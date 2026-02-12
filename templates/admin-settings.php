@@ -128,8 +128,6 @@ function render_profootball_section_row( $index, $data ) {
 			</div>
 			<!-- Add Field button moved to header -->
 		</div>
-		</div>
-	</div>
 	<?php
 }
 
