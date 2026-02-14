@@ -121,50 +121,68 @@ if ( is_user_logged_in() ) {
 
                     <div class="section-body">
                         <div class="profootball-grid-row">
-                            <?php if ( ! empty( $section['fields'] ) ) : ?>
-                                <?php foreach ( $section['fields'] as $f_index => $field ) : ?>
-                                    <?php 
-                                    // Fetch data from UMP mapping
-                                    $value = '';
-                                    if ( $user_id ) {
-                                        $mapping = ! empty( $field['mapping'] ) ? $field['mapping'] : '';
-                                        if ( empty( $mapping ) ) {
-                                            $mapping_suffix = ! empty( $field['label'] ) ? sanitize_title( $field['label'] ) : $f_index;
-                                            $mapping = 'unmapped_field_' . $mapping_suffix;
-                                            $field['mapping'] = $mapping; // Ensure the render function sees the mapping
-                                        }
-                                        $value = get_user_meta( $user_id, $mapping, true );
-                                    }
+                            <?php 
+                            if ( ! empty( $section['fields'] ) ) : 
+                                $fields = $section['fields'];
+                                $total_fields = count($fields);
+                                $i = 0;
 
-                                    // Handle non-premium users for specific fields
-                                    if ( ! $can_view_premium && in_array( $field['type'], array( 'file', 'gallery', 'video' ) ) ) {
-                                        continue; // Skip premium fields
-                                    }
-
-                                    // Layout & Style Settings
+                                while ($i < $total_fields) :
+                                    $field = $fields[$i];
                                     $col_width = ! empty( $field['width'] ) ? $field['width'] : '12';
                                     $css_id = ! empty( $field['css_id'] ) ? $field['css_id'] : '';
                                     $css_class = ! empty( $field['css_class'] ) ? $field['css_class'] : '';
-                                    
-                                    // Label Position
-                                    if ( ! empty( $field['label_pos'] ) && $field['label_pos'] === 'left' ) {
-                                        $css_class .= ' profootball-label-left';
+
+                                    // Collect grouped fields
+                                    $sub_fields = array($field);
+                                    $next_idx = $i + 1;
+                                    while ($next_idx < $total_fields && ! empty($fields[$next_idx]['is_grouped']) && $fields[$next_idx]['is_grouped'] === '1') {
+                                        $sub_fields[] = $fields[$next_idx];
+                                        $next_idx++;
                                     }
+                                    
+                                    // Update main loop index
+                                    $i = $next_idx;
                                     ?>
                                     
-                                    <div <?php echo $css_id ? 'id="'.esc_attr($css_id).'"' : ''; ?> class="profootball-grid-col col-<?php echo esc_attr($col_width); ?> profootball-field-item field-type-<?php echo esc_attr( $field['type'] ); ?> <?php echo esc_attr($css_class); ?>">
-                                        <?php if ( ! empty( $field['label'] ) && ! in_array( $field['type'], array( 'empty_space', 'shortcut_buttons' ) ) ) : ?>
-                                            <span class="field-label"><?php echo esc_html( $field['label'] ); ?></span>
-                                        <?php endif; ?>
+                                    <div <?php echo $css_id ? 'id="'.esc_attr($css_id).'"' : ''; ?> class="profootball-grid-col col-<?php echo esc_attr($col_width); ?> profootball-field-item-group">
+                                        <?php foreach ($sub_fields as $sf_idx => $s_field) : ?>
+                                            <?php 
+                                            // Fetch data
+                                            $value = '';
+                                            if ( $user_id ) {
+                                                $mapping = ! empty( $s_field['mapping'] ) ? $s_field['mapping'] : '';
+                                                if ( empty( $mapping ) ) {
+                                                    $mapping_suffix = ! empty( $s_field['label'] ) ? sanitize_title( $s_field['label'] ) : $sf_idx;
+                                                    $mapping = 'unmapped_f_' . $mapping_suffix;
+                                                }
+                                                $value = get_user_meta( $user_id, $mapping, true );
+                                            }
 
-                                        <?php if ( $field['type'] !== 'empty_space' ) : ?>
-                                            <div class="field-content">
-                                                <!-- Debug: User: <?php echo $user_id; ?>, Mapping: <?php echo $mapping; ?> -->
-                                                <?php render_profootball_public_field( $field, $value ); ?>
+                                            // Skip premium fields for non-premium users
+                                            if ( ! $can_view_premium && in_array( $s_field['type'], array( 'file', 'gallery', 'video' ) ) ) {
+                                                continue;
+                                            }
+
+                                            $s_css_class = ! empty( $s_field['css_class'] ) ? $s_field['css_class'] : '';
+                                            if ( ! empty( $s_field['label_pos'] ) && $s_field['label_pos'] === 'left' ) {
+                                                $s_css_class .= ' profootball-label-left';
+                                            }
+                                            ?>
+                                            <div class="profootball-field-item field-type-<?php echo esc_attr( $s_field['type'] ); ?> <?php echo esc_attr($s_css_class); ?>">
+                                                <?php if ( ! empty( $s_field['label'] ) && ! in_array( $s_field['type'], array( 'empty_space', 'shortcut_buttons' ) ) ) : ?>
+                                                    <span class="field-label"><?php echo esc_html( $s_field['label'] ); ?></span>
+                                                <?php endif; ?>
+
+                                                <?php if ( $s_field['type'] !== 'empty_space' ) : ?>
+                                                    <div class="field-content">
+                                                        <?php render_profootball_public_field( $s_field, $value ); ?>
+                                                    </div>
+                                                <?php endif; ?>
                                             </div>
-                                        <?php endif; ?>
+                                        <?php endforeach; ?>
                                     </div>
-                                <?php endforeach; ?>
+                                <?php endwhile; ?>
                             <?php endif; ?>
                         </div>
                     </div>

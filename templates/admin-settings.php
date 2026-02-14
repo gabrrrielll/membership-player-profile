@@ -156,6 +156,11 @@ function render_profootball_field_row( $s_index, $f_index, $field ) {
 						<input type="checkbox" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][label_pos]" value="left" <?php checked( $label_pos, 'left' ); ?>>
 						Display Label on Left
 					</label>
+					<label style="margin-top:5px; display:block; font-weight:normal; color: #d4af37;">
+						<?php $is_grouped = isset( $field['is_grouped'] ) ? $field['is_grouped'] : ''; ?>
+						<input type="checkbox" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][is_grouped]" value="1" <?php checked( $is_grouped, '1' ); ?>>
+						Group with previous field (Vertical Stack)
+					</label>
 				</div>
 				
 				<div class="field-input-group">

@@ -412,3 +412,27 @@ textarea[name="profootball_custom_css"] {
 .field-input-group {
 	margin-bottom: 8px;
 }
+/* Grouped fields preview styling */
+.preview-field.nested-field {
+    border-top: 1px dashed #94a3b8;
+    border-radius: 0;
+    width: 100% !important;
+    margin-top: 5px;
+    padding-top: 15px;
+    position: relative;
+    background: rgba(212, 175, 55, 0.05);
+}
+
+.preview-field.nested-field::before {
+    content: 'VERTICAL STACK';
+    position: absolute;
+    top: 2px;
+    left: 4px;
+    font-size: 8px;
+    color: #d4af37;
+    font-weight: bold;
+}
+
+.preview-row > .preview-field {
+    flex-direction: column;
+}

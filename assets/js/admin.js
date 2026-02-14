@@ -124,7 +124,7 @@ jQuery(document).ready(function ($) {
     });
 
     // Update preview on any change
-    $(document).on('input change', '.section-title-input, .field-label-preview, .field-width-select', function () {
+    $(document).on('input change', '.section-title-input, .field-label-preview, .field-width-select, input[name*="[is_grouped]"]', function () {
         if ($(this).hasClass('field-width-select')) {
             var width = $(this).val();
             var $row = $(this).closest('.field-config-row');
@@ -156,13 +156,20 @@ jQuery(document).ready(function ($) {
                 var label = $(this).find('.field-label-preview').val() || 'Field';
                 var width = $(this).find('.field-width-select').val() || '12';
                 var type = $(this).find('.field-type-select').val();
+                var isGrouped = $(this).find('input[name*="[is_grouped]"]').is(':checked');
 
                 var widthClass = 'preview-col-' + width;
                 var extraClass = (type === 'empty_space') ? ' preview-empty' : '';
                 var content = (type === 'empty_space') ? '' : '<span>' + label + '</span>';
 
                 var $fieldMock = $('<div class="preview-field ' + widthClass + extraClass + '">' + content + '</div>');
-                $sectionBox.find('.preview-row').append($fieldMock);
+
+                if (isGrouped && $sectionBox.find('.preview-row').children().length > 0) {
+                    // Append to the last column instead of creating a new one
+                    $sectionBox.find('.preview-row').children().last().append($fieldMock.removeClass(widthClass).addClass('nested-field'));
+                } else {
+                    $sectionBox.find('.preview-row').append($fieldMock);
+                }
             });
 
             $visualizer.append($sectionBox);
