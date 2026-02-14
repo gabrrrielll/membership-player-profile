@@ -154,13 +154,18 @@ if ( is_user_logged_in() ) {
                                                 $mapping = ! empty( $s_field['mapping'] ) ? $s_field['mapping'] : '';
                                                 if ( empty( $mapping ) ) {
                                                     $mapping_suffix = ! empty( $s_field['label'] ) ? sanitize_title( $s_field['label'] ) : $sf_idx;
-                                                    $mapping = 'unmapped_f_' . $mapping_suffix;
+                                                    $mapping = 'unmapped_field_' . $mapping_suffix;
                                                 }
                                                 $value = get_user_meta( $user_id, $mapping, true );
                                             }
 
                                             // Skip premium fields for non-premium users
                                             if ( ! $can_view_premium && in_array( $s_field['type'], array( 'file', 'gallery', 'video' ) ) ) {
+                                                continue;
+                                            }
+
+                                            // Skip empty fields to avoid "N/A" blocks in the layout
+                                            if ( empty( $value ) && ! in_array( $s_field['type'], array( 'shortcut_buttons', 'empty_space' ) ) ) {
                                                 continue;
                                             }
 
