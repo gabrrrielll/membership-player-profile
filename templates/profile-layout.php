@@ -329,7 +329,50 @@ function render_profootball_public_field( $field, $value ) {
             <?php
             break;
         case 'video':
-            echo wp_oembed_get( $value );
+            $width = isset( $field['video_width'] ) ? $field['video_width'] : '';
+            $height = isset( $field['video_height'] ) ? $field['video_height'] : '';
+            
+            // Cleanup input
+            $width = trim( $width );
+            $height = trim( $height );
+            
+            // Check for "auto" height which implies responsive 16:9
+            $is_responsive = ( strtolower( $height ) === 'auto' );
+            
+            $oembed_args = array();
+            
+            // If explicit numeric width/height, pass to oEmbed
+            if ( ! empty( $width ) && is_numeric( $width ) ) {
+                $oembed_args['width'] = $width;
+            }
+            if ( ! empty( $height ) && is_numeric( $height ) ) {
+                $oembed_args['height'] = $height;
+            }
+            
+            // Get the raw embed HTML
+            $html = wp_oembed_get( $value, $oembed_args );
+            
+            if ( $html ) {
+                if ( $is_responsive ) {
+                    // Responsive wrapper for 16:9 Aspect Ratio
+                    echo '<div class="profootball-video-responsive" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%;">';
+                    // Force the iframe to fill the container absolute
+                    // Note: Some simple string replacement to ensure inline styles work
+                    $html = str_replace( '<iframe', '<iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"', $html );
+                    echo $html;
+                    echo '</div>';
+                } else {
+                    // Normal display, but respect width if it's a percentage (e.g. 100%)
+                    $container_style = '';
+                    if ( ! empty( $width ) && ! is_numeric( $width ) ) {
+                        $container_style = 'style="width:' . esc_attr( $width ) . ';"';
+                    }
+                    echo '<div class="profootball-video-wrap" ' . $container_style . '>' . $html . '</div>';
+                }
+            } else {
+                // Fallback for non-oembed links? Link to video
+                echo '<a href="' . esc_url( $value ) . '" target="_blank">Watch Video</a>';
+            }
             break;
         case 'nationality':
             $country_code = strtolower( trim( $value ) );

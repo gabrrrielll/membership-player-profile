@@ -143,6 +143,8 @@ function render_profootball_field_row( $s_index, $f_index, $field ) {
 	$download_text = isset( $field['download_text'] ) ? $field['download_text'] : '';
 	$options = isset( $field['options'] ) ? $field['options'] : '';
 	$label_pos = isset( $field['label_pos'] ) ? $field['label_pos'] : ''; // '' (top) or 'left'
+	$video_width = isset( $field['video_width'] ) ? $field['video_width'] : '';
+	$video_height = isset( $field['video_height'] ) ? $field['video_height'] : '';
 	?>
 	<div class="field-config-row profootball-admin-grid-col col-<?php echo esc_attr($width); ?>">
 		<div class="field-config-inner">
@@ -227,6 +229,20 @@ function render_profootball_field_row( $s_index, $f_index, $field ) {
 						<?php $show_nat_name = isset( $field['show_nat_name'] ) ? $field['show_nat_name'] : '1'; ?>
 						<label><input type="checkbox" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][show_nat_name]" value="1" <?php checked( $show_nat_name, '1' ); ?>> Show Nationality Name</label>
 					</div>
+				</div>
+				<div class="video-options-wrap" <?php echo ( $type === 'video' ) ? '' : 'style="display:none;"'; ?> style="margin-top: 10px; border-top: 1px dashed #444; padding-top: 10px;">
+					<label class="admin-field-label">Video Dimensions</label>
+					<div style="display:flex; gap:10px;">
+						<div style="flex:1;">
+							<label style="font-size:11px; color:#aaa;">Width</label>
+							<input type="text" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][video_width]" value="<?php echo esc_attr( $video_width ); ?>" placeholder="e.g. 100% or 600" style="width:100%;">
+						</div>
+						<div style="flex:1;">
+							<label style="font-size:11px; color:#aaa;">Height</label>
+							<input type="text" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][video_height]" value="<?php echo esc_attr( $video_height ); ?>" placeholder="e.g. 400 or auto" style="width:100%;">
+						</div>
+					</div>
+					<p class="description" style="margin-top:5px; font-size:11px; color:#aaa;">For YouTube, use <strong>width: 100%</strong> and <strong>height: auto</strong> to maintain aspect ratio automatically.</p>
 				</div>
 				<div class="download-toggle-wrap" <?php echo ( $type === 'file' || $type === 'image' ) ? '' : 'style="display:none;"'; ?>>
 					<label><input type="checkbox" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][show_download]" value="1" <?php checked( $show_download, '1' ); ?>> Download</label>

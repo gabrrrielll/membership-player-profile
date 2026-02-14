@@ -114,6 +114,12 @@ jQuery(document).ready(function ($) {
         } else {
             $row.find('.field-options-wrap').fadeOut();
         }
+
+        if (type === 'video') {
+            $row.find('.video-options-wrap').fadeIn();
+        } else {
+            $row.find('.video-options-wrap').fadeOut();
+        }
         updateLayoutPreview();
     });
 
