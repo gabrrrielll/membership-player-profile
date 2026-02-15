@@ -172,7 +172,7 @@ if ( is_user_logged_in() ) {
                                             }
 
                                             // Skip empty fields to avoid "N/A" blocks in the layout
-                                            if ( empty( $value ) && ! in_array( $s_field['type'], array( 'shortcut_buttons', 'empty_space' ) ) ) {
+                                            if ( empty( $value ) && ! in_array( $s_field['type'], array( 'shortcut_buttons', 'empty_space', 'static_image' ) ) ) {
                                                 continue;
                                             }
 
