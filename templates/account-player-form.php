@@ -197,8 +197,8 @@ if ( empty( $sections ) ) {
 							$i = $next_idx;
 							?>
 							
-							<div <?php echo $css_id ? 'id="'.esc_attr($css_id).'"' : ''; ?> class="profootball-grid-col col-<?php echo esc_attr($col_width); ?> profootball-field-group-container">
-								<?php foreach ($sub_fields as $s_field) : ?>
+							<div <?php echo $css_id ? 'id="'.esc_attr($css_id).'"' : ''; ?> class="profootball-grid-col col-<?php echo esc_attr($col_width); ?> profootball-field-group-container <?php echo esc_attr($css_class); ?>">
+								<?php foreach ($sub_fields as $s_idx => $s_field) : ?>
 									<?php 
 									$abs_idx = $s_field['_abs_idx'];
 									$mapping = ! empty( $s_field['mapping'] ) ? $s_field['mapping'] : '';
@@ -213,7 +213,7 @@ if ( empty( $sections ) ) {
 									
 									$s_css_class = ! empty( $s_field['css_class'] ) ? $s_field['css_class'] : '';
 									?>
-									<div class="profootball-field-item field-type-<?php echo esc_attr( $s_field['type'] ); ?> <?php echo esc_attr($s_css_class); ?>" style="margin-bottom: 20px;">
+									<div class="profootball-field-item field-type-<?php echo esc_attr( $s_field['type'] ); ?> <?php echo ($s_idx === 0) ? '' : esc_attr($s_css_class); ?>" style="margin-bottom: 20px;">
 										<?php if ( $s_field['type'] === 'empty_space' ) : ?>
 											<!-- Empty Space -->
 										<?php else : ?>

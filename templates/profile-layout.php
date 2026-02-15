@@ -151,8 +151,8 @@ if ( is_user_logged_in() ) {
                                     $i = $next_idx;
                                     ?>
                                     
-                                    <div <?php echo $css_id ? 'id="'.esc_attr($css_id).'"' : ''; ?> class="profootball-grid-col col-<?php echo esc_attr($col_width); ?> profootball-field-item-group">
-                                        <?php foreach ($sub_fields as $s_field) : ?>
+                                    <div <?php echo $css_id ? 'id="'.esc_attr($css_id).'"' : ''; ?> class="profootball-grid-col col-<?php echo esc_attr($col_width); ?> profootball-field-item-group <?php echo esc_attr($css_class); ?>">
+                                        <?php foreach ($sub_fields as $s_idx => $s_field) : ?>
                                             <?php 
                                             // Fetch data
                                             $abs_idx = $s_field['_abs_idx'];
@@ -181,7 +181,7 @@ if ( is_user_logged_in() ) {
                                                 $s_css_class .= ' profootball-label-left';
                                             }
                                             ?>
-                                            <div class="profootball-field-item field-type-<?php echo esc_attr( $s_field['type'] ); ?> <?php echo esc_attr($s_css_class); ?>">
+                                            <div class="profootball-field-item field-type-<?php echo esc_attr( $s_field['type'] ); ?> <?php echo ($s_idx === 0) ? '' : esc_attr($s_css_class); ?>">
                                                 <?php if ( ! empty( $s_field['label'] ) && ! in_array( $s_field['type'], array( 'empty_space', 'shortcut_buttons' ) ) ) : ?>
                                                     <span class="field-label"><?php echo esc_html( $s_field['label'] ); ?></span>
                                                 <?php endif; ?>
