@@ -86,10 +86,24 @@ jQuery(document).ready(function ($) {
     $(document).on('change', '.field-type-select', function () {
         var type = $(this).val();
         var $row = $(this).closest('.field-config-row');
+
+        // Handle Visibility
         if (type === 'file' || type === 'image') {
             $row.find('.download-toggle-wrap').fadeIn();
         } else {
             $row.find('.download-toggle-wrap').fadeOut();
+        }
+
+        if (type === 'static_image') {
+            $row.find('.mapping-config-wrap').hide();
+            $row.find('.static-image-config-wrap').fadeIn();
+        } else {
+            if (type !== 'empty_space') {
+                $row.find('.mapping-config-wrap').show();
+            } else {
+                $row.find('.mapping-config-wrap').hide();
+            }
+            $row.find('.static-image-config-wrap').hide();
         }
 
         if (type === 'shortcut_buttons') {
@@ -123,8 +137,44 @@ jQuery(document).ready(function ($) {
         updateLayoutPreview();
     });
 
+    // Handle Static Image Upload in Admin Settings
+    $(document).on('click', '.pf-static-upload-btn', function (e) {
+        e.preventDefault();
+        var $btn = $(this);
+        var $wrap = $btn.closest('.static-image-config-wrap');
+        var $idInput = $wrap.find('.pf-static-img-id');
+        var $preview = $wrap.find('.pf-static-preview');
+        var $removeBtn = $wrap.find('.pf-static-remove-btn');
+
+        var frame = wp.media({
+            title: 'Select Static Image',
+            button: { text: 'Use this image' },
+            multiple: false
+        });
+
+        frame.on('select', function () {
+            var attachment = frame.state().get('selection').first().toJSON();
+            $idInput.val(attachment.id);
+            $preview.html('<img src="' + attachment.url + '" style="max-width:100px; max-height:100px; display:block; border:1px solid #ddd; padding:2px; background:#fff;">');
+            $removeBtn.fadeIn();
+            updateLayoutPreview();
+        });
+
+        frame.open();
+    });
+
+    $(document).on('click', '.pf-static-remove-btn', function (e) {
+        e.preventDefault();
+        var $btn = $(this);
+        var $wrap = $btn.closest('.static-image-config-wrap');
+        $wrap.find('.pf-static-img-id').val('');
+        $wrap.find('.pf-static-preview').html('<div style="width:50px; height:50px; background:#f0f0f1; border:1px dashed #ccc; display:flex; align-items:center; justify-content:center; color:#ccd0d4;"><span class="dashicons dashicons-format-image"></span></div>');
+        $btn.hide();
+        updateLayoutPreview();
+    });
+
     // Update preview on any change
-    $(document).on('input change', '.section-title-input, .field-label-preview, .field-width-select, input[name*="[is_grouped]"]', function () {
+    $(document).on('input change', '.section-title-input, .field-label-preview, .field-width-select, input[name*="[is_grouped]"], input[name*="[is_admin_only]"]', function () {
         if ($(this).hasClass('field-width-select')) {
             var width = $(this).val();
             var $row = $(this).closest('.field-config-row');

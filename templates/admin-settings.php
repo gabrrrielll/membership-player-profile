@@ -182,10 +182,11 @@ function render_profootball_field_row( $s_index, $f_index, $field ) {
 						<option value="empty_space" <?php selected( $type, 'empty_space' ); ?>>Empty Space Placeholder</option>
 						<option value="nationality" <?php selected( $type, 'nationality' ); ?>>Nationality (Flag)</option>
 						<option value="shortcut_buttons" <?php selected( $type, 'shortcut_buttons' ); ?>>Shortcut Buttons (Vertical Nav)</option>
+						<option value="static_image" <?php selected( $type, 'static_image' ); ?>>Static Image (UI/Design Icon)</option>
 					</select>
 				</div>
 				
-				<div class="field-input-group">
+				<div class="field-input-group mapping-config-wrap" <?php echo ( $type === 'static_image' || $type === 'empty_space' ) ? 'style="display:none;"' : ''; ?>>
 					<label class="admin-field-label">Mapping</label>
 					<select name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][mapping]" class="ump-mapping-select">
 						<option value="">-- Select --</option>
@@ -207,6 +208,27 @@ function render_profootball_field_row( $s_index, $f_index, $field ) {
 							<?php endif; ?>
 						</optgroup>
 					</select>
+				</div>
+
+				<div class="field-input-group static-image-config-wrap" <?php echo ( $type === 'static_image' ) ? '' : 'style="display:none;"'; ?>>
+					<label class="admin-field-label">Static Image Asset</label>
+					<?php 
+					$static_img_id = isset( $field['static_image_id'] ) ? $field['static_image_id'] : '';
+					$static_img_url = '';
+					if ( $static_img_id ) {
+						$static_img_url = is_numeric($static_img_id) ? wp_get_attachment_url($static_img_id) : $static_img_id;
+					}
+					?>
+					<div class="pf-static-preview" style="margin-bottom:8px;">
+						<?php if ( $static_img_url ) : ?>
+							<img src="<?php echo esc_url($static_img_url); ?>" style="max-width:100px; max-height:100px; display:block; border:1px solid #ddd; padding:2px; background:#fff;">
+						<?php else : ?>
+							<div style="width:50px; height:50px; background:#f0f0f1; border:1px dashed #ccc; display:flex; align-items:center; justify-content:center; color:#ccd0d4;"><span class="dashicons dashicons-format-image"></span></div>
+						<?php endif; ?>
+					</div>
+					<input type="hidden" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][static_image_id]" value="<?php echo esc_attr($static_img_id); ?>" class="pf-static-img-id">
+					<button type="button" class="button pf-static-upload-btn">Upload / Select Image</button>
+					<button type="button" class="button-link pf-static-remove-btn" style="<?php echo $static_img_id ? '' : 'display:none;'; ?> color:#d63638;">Remove</button>
 				</div>
 				
 				<div class="field-input-group">

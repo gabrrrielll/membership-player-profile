@@ -445,6 +445,13 @@ function render_profootball_public_field( $field, $value ) {
                 echo '</nav>';
             }
             break;
+        case 'static_image':
+            $img_id = isset( $field['static_image_id'] ) ? $field['static_image_id'] : '';
+            if ( $img_id ) {
+                $img_url = is_numeric( $img_id ) ? wp_get_attachment_url( $img_id ) : $img_id;
+                echo '<img src="' . esc_url( $img_url ) . '" class="profootball-static-image">';
+            }
+            break;
         case 'text':
         default:
             echo esc_html( $value );
