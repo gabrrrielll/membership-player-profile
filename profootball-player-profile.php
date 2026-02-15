@@ -157,6 +157,7 @@ class ProFootball_Player_Profile {
 					$value = isset( $_POST[ $mapping ] ) ? $_POST[ $mapping ] : '';
 					
 					// 1. Sync to User Meta (UMP)
+					$value = wp_unslash($value);
 					if ( $field['type'] === 'gallery' || $field['type'] === 'video' ) {
 						update_user_meta( $user_id, $mapping, sanitize_text_field( $value ) );
 					} else {

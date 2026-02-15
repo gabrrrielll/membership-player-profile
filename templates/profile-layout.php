@@ -123,12 +123,18 @@ if ( is_user_logged_in() ) {
                         <div class="profootball-grid-row">
                             <?php 
                             if ( ! empty( $section['fields'] ) ) : 
-                                $fields = $section['fields'];
-                                $total_fields = count($fields);
+                                // Prepare fields to ensure we have sequential iteration but preserve original keys
+                                $fields_list = array();
+                                foreach ( $section['fields'] as $key => $f ) {
+                                    $f['_abs_idx'] = $key;
+                                    $fields_list[] = $f;
+                                }
+                                
+                                $total_fields = count($fields_list);
                                 $i = 0;
 
                                 while ($i < $total_fields) :
-                                    $field = $fields[$i];
+                                    $field = $fields_list[$i];
                                     $col_width = ! empty( $field['width'] ) ? $field['width'] : '12';
                                     $css_id = ! empty( $field['css_id'] ) ? $field['css_id'] : '';
                                     $css_class = ! empty( $field['css_class'] ) ? $field['css_class'] : '';
@@ -136,8 +142,8 @@ if ( is_user_logged_in() ) {
                                     // Collect grouped fields
                                     $sub_fields = array($field);
                                     $next_idx = $i + 1;
-                                    while ($next_idx < $total_fields && ! empty($fields[$next_idx]['is_grouped']) && $fields[$next_idx]['is_grouped'] === '1') {
-                                        $sub_fields[] = $fields[$next_idx];
+                                    while ($next_idx < $total_fields && ! empty($fields_list[$next_idx]['is_grouped']) && $fields_list[$next_idx]['is_grouped'] === '1') {
+                                        $sub_fields[] = $fields_list[$next_idx];
                                         $next_idx++;
                                     }
                                     
@@ -146,14 +152,15 @@ if ( is_user_logged_in() ) {
                                     ?>
                                     
                                     <div <?php echo $css_id ? 'id="'.esc_attr($css_id).'"' : ''; ?> class="profootball-grid-col col-<?php echo esc_attr($col_width); ?> profootball-field-item-group">
-                                        <?php foreach ($sub_fields as $sf_idx => $s_field) : ?>
+                                        <?php foreach ($sub_fields as $s_field) : ?>
                                             <?php 
                                             // Fetch data
+                                            $abs_idx = $s_field['_abs_idx'];
                                             $value = '';
                                             if ( $user_id ) {
                                                 $mapping = ! empty( $s_field['mapping'] ) ? $s_field['mapping'] : '';
                                                 if ( empty( $mapping ) ) {
-                                                    $mapping_suffix = ! empty( $s_field['label'] ) ? sanitize_title( $s_field['label'] ) : $sf_idx;
+                                                    $mapping_suffix = ! empty( $s_field['label'] ) ? sanitize_title( $s_field['label'] ) : $abs_idx;
                                                     $mapping = 'unmapped_field_' . $mapping_suffix;
                                                 }
                                                 $value = get_user_meta( $user_id, $mapping, true );
