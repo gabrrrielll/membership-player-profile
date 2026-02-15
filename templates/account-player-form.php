@@ -212,6 +212,9 @@ if ( empty( $sections ) ) {
 									$taxonomy = $is_taxonomy ? substr( $mapping, 4 ) : '';
 									
 									$s_css_class = ! empty( $s_field['css_class'] ) ? $s_field['css_class'] : '';
+									$is_admin_only = ! empty( $s_field['is_admin_only'] ) && $s_field['is_admin_only'] === '1';
+									
+									if ( $is_admin_only ) continue;
 									?>
 									<div class="profootball-field-item field-type-<?php echo esc_attr( $s_field['type'] ); ?> <?php echo ($s_idx === 0) ? '' : esc_attr($s_css_class); ?>" style="margin-bottom: 20px;">
 										<?php if ( $s_field['type'] === 'empty_space' ) : ?>

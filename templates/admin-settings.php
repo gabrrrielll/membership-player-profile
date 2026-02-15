@@ -161,6 +161,11 @@ function render_profootball_field_row( $s_index, $f_index, $field ) {
 						<input type="checkbox" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][is_grouped]" value="1" <?php checked( $is_grouped, '1' ); ?>>
 						Group with previous field (Vertical Stack)
 					</label>
+					<label style="margin-top:5px; display:block; font-weight:normal; color: #2271b1;">
+						<?php $is_admin_only = isset( $field['is_admin_only'] ) ? $field['is_admin_only'] : ''; ?>
+						<input type="checkbox" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][is_admin_only]" value="1" <?php checked( $is_admin_only, '1' ); ?>>
+						Admin Only (Invisible to Player in Edit Form)
+					</label>
 				</div>
 				
 				<div class="field-input-group">

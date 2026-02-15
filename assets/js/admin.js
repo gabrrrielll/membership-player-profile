@@ -157,10 +157,13 @@ jQuery(document).ready(function ($) {
                 var width = $(this).find('.field-width-select').val() || '12';
                 var type = $(this).find('.field-type-select').val();
                 var isGrouped = $(this).find('input[name*="[is_grouped]"]').is(':checked');
+                var isAdminOnly = $(this).find('input[name*="[is_admin_only]"]').is(':checked');
 
                 var widthClass = 'preview-col-' + width;
                 var extraClass = (type === 'empty_space') ? ' preview-empty' : '';
-                var content = (type === 'empty_space') ? '' : '<span>' + label + '</span>';
+                if (isAdminOnly) extraClass += ' preview-admin-only';
+
+                var content = (type === 'empty_space') ? '' : '<span>' + label + (isAdminOnly ? ' <i style="font-size:10px;">(Admin Only)</i>' : '') + '</span>';
 
                 var $fieldMock = $('<div class="preview-field ' + widthClass + extraClass + '">' + content + '</div>');
 

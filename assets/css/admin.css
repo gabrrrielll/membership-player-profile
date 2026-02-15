@@ -436,3 +436,12 @@ textarea[name="profootball_custom_css"] {
 .preview-row > .preview-field {
     flex-direction: column;
 }
+
+.preview-field.preview-admin-only {
+	border: 1px solid #1e293b;
+	background: #1e293b;
+	color: #fff;
+}
+.preview-field.preview-admin-only i {
+	color: #94a3b8;
+}
