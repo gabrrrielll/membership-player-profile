@@ -273,7 +273,7 @@ function profootball_build_options_map( $raw_options ) {
 }
 
 function render_profootball_public_field( $field, $value ) {
-    if ( empty( $value ) && $field['type'] !== 'shortcut_buttons' ) {
+    if ( empty( $value ) && ! in_array( $field['type'], array( 'shortcut_buttons', 'static_image', 'empty_space' ) ) ) {
         echo '<span class="empty-field">N/A</span>';
         return;
     }
