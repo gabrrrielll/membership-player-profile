@@ -137,8 +137,10 @@ function render_profootball_field_row( $s_index, $f_index, $field ) {
 	$type = isset( $field['type'] ) ? $field['type'] : 'text';
 	$mapping = isset( $field['mapping'] ) ? $field['mapping'] : '';
 	$width = isset( $field['width'] ) ? $field['width'] : '12';
-	$css_class = isset( $field['css_class'] ) ? $field['css_class'] : '';
-	$css_id = isset( $field['css_id'] ) ? $field['css_id'] : '';
+	$css_class_public = isset( $field['css_class_public'] ) ? $field['css_class_public'] : (isset($field['css_class']) ? $field['css_class'] : '');
+	$css_id_public    = isset( $field['css_id_public'] ) ? $field['css_id_public'] : (isset($field['css_id']) ? $field['css_id'] : '');
+	$css_class_edit   = isset( $field['css_class_edit'] ) ? $field['css_class_edit'] : (isset($field['css_class']) ? $field['css_class'] : '');
+	$css_id_edit      = isset( $field['css_id_edit'] ) ? $field['css_id_edit'] : (isset($field['css_id']) ? $field['css_id'] : '');
 	$show_download = isset( $field['show_download'] ) ? $field['show_download'] : '';
 	$download_text = isset( $field['download_text'] ) ? $field['download_text'] : '';
 	$options = isset( $field['options'] ) ? $field['options'] : '';
@@ -243,10 +245,18 @@ function render_profootball_field_row( $s_index, $f_index, $field ) {
 				</div>
 
 				<div class="field-input-group">
-					<label class="admin-field-label">CSS Class/ID</label>
+					<label class="admin-field-label">Public Profile CSS (Class / ID)</label>
 					<div style="display:flex; gap:5px;">
-						<input type="text" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][css_class]" value="<?php echo esc_attr( $css_class ); ?>" placeholder="Class" style="flex:1;">
-						<input type="text" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][css_id]" value="<?php echo esc_attr( $css_id ); ?>" placeholder="ID" style="flex:1;">
+						<input type="text" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][css_class_public]" value="<?php echo esc_attr( $css_class_public ); ?>" placeholder="Class" style="flex:1;">
+						<input type="text" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][css_id_public]" value="<?php echo esc_attr( $css_id_public ); ?>" placeholder="ID" style="flex:1;">
+					</div>
+				</div>
+
+				<div class="field-input-group">
+					<label class="admin-field-label">Account Edit CSS (Class / ID)</label>
+					<div style="display:flex; gap:5px;">
+						<input type="text" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][css_class_edit]" value="<?php echo esc_attr( $css_class_edit ); ?>" placeholder="Class" style="flex:1;">
+						<input type="text" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][css_id_edit]" value="<?php echo esc_attr( $css_id_edit ); ?>" placeholder="ID" style="flex:1;">
 					</div>
 				</div>
 			</div>

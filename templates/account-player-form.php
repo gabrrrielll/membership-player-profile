@@ -185,8 +185,8 @@ if ( empty( $sections ) ) {
 						while ($i < $total_fields) :
 							$field = $fields_list[$i];
 							$col_width = ! empty( $field['width'] ) ? $field['width'] : '12';
-							$css_id = ! empty( $field['css_id'] ) ? $field['css_id'] : '';
-							$css_class = ! empty( $field['css_class'] ) ? $field['css_class'] : '';
+							$css_id    = ! empty( $field['css_id_edit'] ) ? $field['css_id_edit'] : (! empty($field['css_id']) ? $field['css_id'] : '');
+							$css_class = ! empty( $field['css_class_edit'] ) ? $field['css_class_edit'] : (! empty($field['css_class']) ? $field['css_class'] : '');
 
 							$sub_fields = array($field);
 							$next_idx = $i + 1;
@@ -211,7 +211,7 @@ if ( empty( $sections ) ) {
 									$is_taxonomy = ( strpos( $mapping, 'tax_' ) === 0 );
 									$taxonomy = $is_taxonomy ? substr( $mapping, 4 ) : '';
 									
-									$s_css_class = ! empty( $s_field['css_class'] ) ? $s_field['css_class'] : '';
+									$s_css_class = ! empty( $s_field['css_class_edit'] ) ? $s_field['css_class_edit'] : (! empty($s_field['css_class']) ? $s_field['css_class'] : '');
 									$is_admin_only = ! empty( $s_field['is_admin_only'] ) && $s_field['is_admin_only'] === '1';
 									
 									if ( $is_admin_only || $s_field['type'] === 'static_image' ) continue;

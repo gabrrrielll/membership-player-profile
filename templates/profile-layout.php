@@ -136,8 +136,8 @@ if ( is_user_logged_in() ) {
                                 while ($i < $total_fields) :
                                     $field = $fields_list[$i];
                                     $col_width = ! empty( $field['width'] ) ? $field['width'] : '12';
-                                    $css_id = ! empty( $field['css_id'] ) ? $field['css_id'] : '';
-                                    $css_class = ! empty( $field['css_class'] ) ? $field['css_class'] : '';
+                                    $css_id    = ! empty( $field['css_id_public'] ) ? $field['css_id_public'] : (! empty($field['css_id']) ? $field['css_id'] : '');
+                                    $css_class = ! empty( $field['css_class_public'] ) ? $field['css_class_public'] : (! empty($field['css_class']) ? $field['css_class'] : '');
 
                                     // Collect grouped fields
                                     $sub_fields = array($field);
@@ -176,7 +176,7 @@ if ( is_user_logged_in() ) {
                                                 continue;
                                             }
 
-                                            $s_css_class = ! empty( $s_field['css_class'] ) ? $s_field['css_class'] : '';
+                                            $s_css_class = ! empty( $s_field['css_class_public'] ) ? $s_field['css_class_public'] : (! empty($s_field['css_class']) ? $s_field['css_class'] : '');
                                             if ( ! empty( $s_field['label_pos'] ) && $s_field['label_pos'] === 'left' ) {
                                                 $s_css_class .= ' profootball-label-left';
                                             }

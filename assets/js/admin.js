@@ -174,7 +174,7 @@ jQuery(document).ready(function ($) {
     });
 
     // Update preview on any change
-    $(document).on('input change', '.section-title-input, .field-label-preview, .field-width-select, input[name*="[is_grouped]"], input[name*="[is_admin_only]"]', function () {
+    $(document).on('input change', '.section-title-input, .field-label-preview, .field-width-select, input[name*="[is_grouped]"], input[name*="[is_admin_only]"], input[name*="[css_"]', function () {
         if ($(this).hasClass('field-width-select')) {
             var width = $(this).val();
             var $row = $(this).closest('.field-config-row');
