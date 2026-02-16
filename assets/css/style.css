@@ -282,36 +282,51 @@
     }
 }
 
-/* Label Position: Left */
+/* Label Position: Left (List Style) */
 .profootball-label-left {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    display: block;
+    margin-bottom: 8px;
+    padding-left: 18px;
+    position: relative;
+    line-height: 1.5;
+}
+
+.profootball-label-left::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: #fff;
+    font-size: 1.2em;
+    line-height: inherit;
 }
 
 .profootball-label-left .field-label {
+    display: inline;
     margin-bottom: 0;
-    margin-right: 20px;
-    min-width: 150px;
-    flex-shrink: 0;
+    margin-right: 2px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: none;
+    font-size: 1em;
+}
+
+.profootball-label-left .field-label::after {
+    content: ":";
 }
 
 .profootball-label-left .field-content {
-    flex-grow: 1;
-    text-align: right;
+    display: inline;
+    color: #ccc;
+    font-size: 1em;
+}
+
+.profootball-label-left .field-content p {
+    display: inline;
+    margin: 0;
 }
 
 @media (max-width: 768px) {
     .profootball-label-left {
         display: block;
-    }
-
-    .profootball-label-left .field-label {
-        margin-bottom: 5px;
-        margin-right: 0;
-    }
-
-    .profootball-label-left .field-content {
-        text-align: left;
     }
 }
