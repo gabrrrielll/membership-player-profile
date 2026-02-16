@@ -172,7 +172,7 @@ if ( is_user_logged_in() ) {
                                             }
 
                                             // Skip empty fields to avoid "N/A" blocks in the layout
-                                            if ( empty( $value ) && ! in_array( $s_field['type'], array( 'shortcut_buttons', 'empty_space', 'static_image' ) ) ) {
+                                            if ( empty( $value ) && ! in_array( $s_field['type'], array( 'shortcut_buttons', 'empty_space', 'static_image', 'static_textarea' ) ) ) {
                                                 continue;
                                             }
 
@@ -273,7 +273,7 @@ function profootball_build_options_map( $raw_options ) {
 }
 
 function render_profootball_public_field( $field, $value ) {
-    if ( empty( $value ) && ! in_array( $field['type'], array( 'shortcut_buttons', 'static_image', 'empty_space' ) ) ) {
+    if ( empty( $value ) && ! in_array( $field['type'], array( 'shortcut_buttons', 'static_image', 'static_textarea', 'empty_space' ) ) ) {
         echo '<span class="empty-field">N/A</span>';
         return;
     }
@@ -450,6 +450,12 @@ function render_profootball_public_field( $field, $value ) {
             if ( $img_id ) {
                 $img_url = is_numeric( $img_id ) ? wp_get_attachment_url( $img_id ) : $img_id;
                 echo '<img src="' . esc_url( $img_url ) . '" class="profootball-static-image">';
+            }
+            break;
+        case 'static_textarea':
+            $content = isset( $field['static_text'] ) ? $field['static_text'] : '';
+            if ( $content ) {
+                echo '<div class="profootball-static-text">' . wp_kses_post( wpautop( $content ) ) . '</div>';
             }
             break;
         case 'text':

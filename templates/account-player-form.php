@@ -214,7 +214,7 @@ if ( empty( $sections ) ) {
 									$s_css_class = ! empty( $s_field['css_class_edit'] ) ? $s_field['css_class_edit'] : (! empty($s_field['css_class']) ? $s_field['css_class'] : '');
 									$is_admin_only = ! empty( $s_field['is_admin_only'] ) && $s_field['is_admin_only'] === '1';
 									
-									if ( $is_admin_only || $s_field['type'] === 'static_image' ) continue;
+									if ( $is_admin_only || in_array($s_field['type'], array('static_image', 'static_textarea')) ) continue;
 									?>
 									<div class="profootball-field-item field-type-<?php echo esc_attr( $s_field['type'] ); ?> <?php echo ($s_idx === 0) ? '' : esc_attr($s_css_class); ?>" style="margin-bottom: 20px;">
 										<?php if ( $s_field['type'] === 'empty_space' ) : ?>

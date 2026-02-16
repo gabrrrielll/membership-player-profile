@@ -97,6 +97,11 @@ jQuery(document).ready(function ($) {
         if (type === 'static_image') {
             $row.find('.mapping-config-wrap').hide();
             $row.find('.static-image-config-wrap').fadeIn();
+            $row.find('.static-text-config-wrap').hide();
+        } else if (type === 'static_textarea') {
+            $row.find('.mapping-config-wrap').hide();
+            $row.find('.static-image-config-wrap').hide();
+            $row.find('.static-text-config-wrap').fadeIn();
         } else {
             if (type !== 'empty_space') {
                 $row.find('.mapping-config-wrap').show();
@@ -104,6 +109,7 @@ jQuery(document).ready(function ($) {
                 $row.find('.mapping-config-wrap').hide();
             }
             $row.find('.static-image-config-wrap').hide();
+            $row.find('.static-text-config-wrap').hide();
         }
 
         if (type === 'shortcut_buttons') {
@@ -213,7 +219,7 @@ jQuery(document).ready(function ($) {
                 var extraClass = (type === 'empty_space') ? ' preview-empty' : '';
                 if (isAdminOnly) extraClass += ' preview-admin-only';
 
-                var content = (type === 'empty_space') ? '' : '<span>' + label + (isAdminOnly ? ' <i style="font-size:10px;">(Admin Only)</i>' : '') + '</span>';
+                var content = (type === 'empty_space') ? '' : '<span>' + label + (isAdminOnly ? ' <i style="font-size:10px;">(Admin Only)</i>' : '') + (type === 'static_textarea' ? ' <i style="font-size:10px;">(Static Text)</i>' : '') + '</span>';
 
                 var $fieldMock = $('<div class="preview-field ' + widthClass + extraClass + '">' + content + '</div>');
 

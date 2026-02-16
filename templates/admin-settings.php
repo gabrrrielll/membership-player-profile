@@ -185,10 +185,11 @@ function render_profootball_field_row( $s_index, $f_index, $field ) {
 						<option value="nationality" <?php selected( $type, 'nationality' ); ?>>Nationality (Flag)</option>
 						<option value="shortcut_buttons" <?php selected( $type, 'shortcut_buttons' ); ?>>Shortcut Buttons (Vertical Nav)</option>
 						<option value="static_image" <?php selected( $type, 'static_image' ); ?>>Static Image (UI/Design Icon)</option>
+						<option value="static_textarea" <?php selected( $type, 'static_textarea' ); ?>>Static Text (Admin Content)</option>
 					</select>
 				</div>
 				
-				<div class="field-input-group mapping-config-wrap" <?php echo ( $type === 'static_image' || $type === 'empty_space' ) ? 'style="display:none;"' : ''; ?>>
+				<div class="field-input-group mapping-config-wrap" <?php echo ( in_array($type, array('static_image', 'static_textarea', 'empty_space')) ) ? 'style="display:none;"' : ''; ?>>
 					<label class="admin-field-label">Mapping</label>
 					<select name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][mapping]" class="ump-mapping-select">
 						<option value="">-- Select --</option>
@@ -231,6 +232,15 @@ function render_profootball_field_row( $s_index, $f_index, $field ) {
 					<input type="hidden" name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][static_image_id]" value="<?php echo esc_attr($static_img_id); ?>" class="pf-static-img-id">
 					<button type="button" class="button pf-static-upload-btn">Upload / Select Image</button>
 					<button type="button" class="button-link pf-static-remove-btn" style="<?php echo $static_img_id ? '' : 'display:none;'; ?> color:#d63638;">Remove</button>
+				</div>
+
+				<div class="field-input-group static-text-config-wrap" <?php echo ( $type === 'static_textarea' ) ? '' : 'style="display:none;"'; ?>>
+					<label class="admin-field-label">Static Content (HTML allowed)</label>
+					<?php 
+					$static_text = isset( $field['static_text'] ) ? $field['static_text'] : '';
+					?>
+					<textarea name="profootball_player_sections[<?php echo $s_index; ?>][fields][<?php echo $f_index; ?>][static_text]" rows="4" style="width:100%; border:1px solid #ddd; background:#fff;" placeholder="Enter text or HTML here..."><?php echo esc_textarea($static_text); ?></textarea>
+					<small class="description">This content is fixed for all players and only shown on the public profile.</small>
 				</div>
 				
 				<div class="field-input-group">
