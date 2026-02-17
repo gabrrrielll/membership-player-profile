@@ -201,11 +201,7 @@ if ( empty( $sections ) ) {
 								<?php foreach ($sub_fields as $s_idx => $s_field) : ?>
 									<?php 
 									$abs_idx = $s_field['_abs_idx'];
-									$mapping = ! empty( $s_field['mapping'] ) ? $s_field['mapping'] : '';
-									if ( empty( $mapping ) ) {
-										$mapping_suffix = ! empty( $s_field['label'] ) ? sanitize_title( $s_field['label'] ) : $abs_idx;
-										$mapping = 'unmapped_field_' . $mapping_suffix;
-									}
+									$mapping = ( new ProFootball_Player_Profile() )->get_field_mapping( $s_field, $s_idx, $abs_idx );
 									
 									$value = get_user_meta( $user_id, $mapping, true );
 									$is_taxonomy = ( strpos( $mapping, 'tax_' ) === 0 );

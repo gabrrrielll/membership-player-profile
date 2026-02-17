@@ -109,6 +109,22 @@ class ProFootball_Player_Profile {
 	}
 
 	/**
+	 * Helper to get consistent mapping key
+	 */
+	public function get_field_mapping( $field, $section_idx = 0, $field_idx = 0 ) {
+		$mapping = ! empty( $field['mapping'] ) ? $field['mapping'] : '';
+		if ( empty( $mapping ) ) {
+			$label = ! empty( $field['label'] ) ? $field['label'] : '';
+			if ( $label ) {
+				$mapping = 'unmapped_field_' . sanitize_title( $label );
+			} else {
+				$mapping = 'unmapped_field_s' . $section_idx . '_f' . $field_idx;
+			}
+		}
+		return $mapping;
+	}
+
+	/**
 	 * Handle the saving of dynamic fields from the account page
 	 */
 	public function handle_player_profile_save() {
@@ -128,15 +144,11 @@ class ProFootball_Player_Profile {
 		require_once( ABSPATH . 'wp-admin/includes/file.php' );
 		require_once( ABSPATH . 'wp-admin/includes/media.php' );
 
-		foreach ( $sections as $section ) {
+		foreach ( $sections as $s_idx => $section ) {
 			if ( empty( $section['fields'] ) ) continue;
 
-			foreach ( $section['fields'] as $f_index => $field ) {
-				$mapping = ! empty( $field['mapping'] ) ? $field['mapping'] : '';
-				if ( empty( $mapping ) ) {
-					$mapping_suffix = ! empty( $field['label'] ) ? sanitize_title( $field['label'] ) : $f_index;
-					$mapping = 'unmapped_field_' . $mapping_suffix;
-				}
+			foreach ( $section['fields'] as $f_idx => $field ) {
+				$mapping = $this->get_field_mapping( $field, $s_idx, $f_idx );
 
 				// Handle File/Image uploads separately
 				if ( ( $field['type'] === 'file' || $field['type'] === 'image' ) ) {
@@ -227,10 +239,10 @@ class ProFootball_Player_Profile {
 		// We need to avoid infinite loop since handle_player_profile_save also updates things
 		remove_action( 'save_post_sp_player', array( $this, 'sync_player_to_user_meta' ), 15 );
 
-		foreach ( $sections as $section ) {
+		foreach ( $sections as $s_idx => $section ) {
 			if ( empty( $section['fields'] ) ) continue;
-			foreach ( $section['fields'] as $field ) {
-				$mapping = ! empty( $field['mapping'] ) ? $field['mapping'] : '';
+			foreach ( $section['fields'] as $f_idx => $field ) {
+				$mapping = $this->get_field_mapping( $field, $s_idx, $f_idx );
 				if ( ! $mapping ) continue;
 
 				// If it's a taxonomy

@@ -53,7 +53,7 @@ class ProFootball_Admin {
 		wp_nonce_field( 'profootball_admin_save_nonce', 'profootball_admin_nonce' );
 
 		echo '<div class="profootball-admin-metabox-wrap">';
-		foreach ( $sections as $section ) {
+		foreach ( $sections as $s_idx => $section ) {
 			if ( empty( $section['fields'] ) ) continue;
 
 			echo '<div class="admin-metabox-section">';
@@ -63,11 +63,7 @@ class ProFootball_Admin {
 			foreach ( $section['fields'] as $f_idx => $field ) {
 				if ( $field['type'] === 'empty_space' || $field['type'] === 'shortcut_buttons' ) continue;
 
-				$mapping = ! empty( $field['mapping'] ) ? $field['mapping'] : '';
-				if ( empty( $mapping ) ) {
-					$mapping_suffix = ! empty( $field['label'] ) ? sanitize_title( $field['label'] ) : $f_idx;
-					$mapping = 'unmapped_field_' . $mapping_suffix;
-				}
+				$mapping = ( new ProFootball_Player_Profile() )->get_field_mapping( $field, $s_idx, $f_idx );
 
 				// Skip standard SP fields as they are already available in SP metaboxes
 				$standard_sp = array( '_sp_number', 'sp_nationality', 'sp_metrics', '_thumbnail_id', 'sp_video', 'sp_hometown', 'sp_birthday' );
