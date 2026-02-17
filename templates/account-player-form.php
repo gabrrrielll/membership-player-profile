@@ -165,7 +165,7 @@ if ( empty( $sections ) ) {
 	<form method="post" action="" enctype="multipart/form-data">
 		<?php wp_nonce_field( 'profootball_save_action', 'profootball_profile_nonce' ); ?>
 		
-		<?php foreach ( $sections as $section ) : ?>
+		<?php foreach ( $sections as $section_idx => $section ) : ?>
 			<div class="profootball-form-section">
 				<h4><?php echo esc_html( $section['title'] ); ?></h4>
 				
@@ -198,10 +198,10 @@ if ( empty( $sections ) ) {
 							?>
 							
 							<div <?php echo $css_id ? 'id="'.esc_attr($css_id).'"' : ''; ?> class="profootball-grid-col col-<?php echo esc_attr($col_width); ?> profootball-field-group-container <?php echo esc_attr($css_class); ?>">
-								<?php foreach ($sub_fields as $s_idx => $s_field) : ?>
+								<?php foreach ($sub_fields as $sf_idx => $s_field) : ?>
 									<?php 
 									$abs_idx = $s_field['_abs_idx'];
-									$mapping = ( new ProFootball_Player_Profile() )->get_field_mapping( $s_field, $s_idx, $abs_idx );
+									$mapping = ( new ProFootball_Player_Profile() )->get_field_mapping( $s_field, $section_idx, $abs_idx );
 									
 									$value = get_user_meta( $user_id, $mapping, true );
 									$is_taxonomy = ( strpos( $mapping, 'tax_' ) === 0 );
@@ -279,10 +279,19 @@ if ( empty( $sections ) ) {
 												</select>
 
 											<?php elseif ( $s_field['type'] === 'file' || $s_field['type'] === 'image' ) : ?>
-												<input type="file" name="<?php echo esc_attr( $mapping ); ?>">
-												<?php if ( $value ) : ?>
-													<p style="font-size:11px; margin-top:5px;">Current: <?php echo esc_html(basename(is_numeric($value) ? wp_get_attachment_url($value) : $value)); ?></p>
-												<?php endif; ?>
+												<div class="profootball-upload-wrapper <?php echo $value ? 'has-existing-file' : ''; ?>">
+													<label class="profootball-upload-label">
+														<span class="dashicons dashicons-cloud-upload"></span>
+														<span class="upload-btn-text"><?php echo $value ? 'Change File' : 'Choose File'; ?></span>
+														<input type="file" name="<?php echo esc_attr( $mapping ); ?>" class="profootball-hidden-input">
+													</label>
+													<?php if ( $value ) : ?>
+														<div class="profootball-current-file-meta">
+															<span class="dashicons dashicons-yes-alt"></span>
+															<span>Current: <strong><?php echo esc_html(basename(is_numeric($value) ? wp_get_attachment_url($value) : $value)); ?></strong></span>
+														</div>
+													<?php endif; ?>
+												</div>
 											
 											<?php else : ?>
 												<input type="text" name="<?php echo esc_attr( $mapping ); ?>" value="<?php echo esc_attr( $value ); ?>" style="width:100%;">
