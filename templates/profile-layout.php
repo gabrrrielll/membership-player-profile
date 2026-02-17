@@ -429,7 +429,7 @@ function render_profootball_public_field( $field, $value ) {
             $file_name = basename( $file_url );
             if ( ! empty( $field['show_download'] ) && $field['show_download'] === '1' ) {
                 $btn_text = ! empty( $field['download_text'] ) ? $field['download_text'] : 'Download ' . $field['label'];
-                echo '<a href="' . esc_url( $file_url ) . '" class="profootball-download-link" target="_blank" download>' . esc_html( $btn_text ) . ' (' . esc_html( $file_name ) . ')</a>';
+                echo '<a href="' . esc_url( $file_url ) . '" class="profootball-download-link" target="_blank" download>' . esc_html( $btn_text ) . '</a>';
             } else {
                 echo '<span class="file-status">File Uploaded</span>'; 
             }

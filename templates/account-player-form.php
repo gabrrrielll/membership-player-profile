@@ -216,7 +216,7 @@ if ( empty( $sections ) ) {
 									
 									if ( $is_admin_only || in_array($s_field['type'], array('static_image', 'static_textarea')) ) continue;
 									?>
-									<div class="profootball-field-item field-type-<?php echo esc_attr( $s_field['type'] ); ?> <?php echo ($s_idx === 0) ? '' : esc_attr($s_css_class); ?>" style="margin-bottom: 20px;">
+									<div class="profootball-field-item field-type-<?php echo esc_attr( $s_field['type'] ); ?> <?php echo esc_attr($s_css_class); ?>" style="margin-bottom: 20px;">
 										<?php if ( $s_field['type'] === 'empty_space' ) : ?>
 											<!-- Empty Space -->
 										<?php else : ?>
