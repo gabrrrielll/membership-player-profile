@@ -292,6 +292,39 @@ if ( empty( $sections ) ) {
 														</div>
 													<?php endif; ?>
 												</div>
+
+											<?php elseif ( $s_field['type'] === 'gallery' ) : ?>
+												<?php
+												$gallery_ids = array();
+												if ( $value ) {
+													$decoded = json_decode( $value, true );
+													if ( is_array( $decoded ) ) {
+														$gallery_ids = $decoded;
+													} else {
+														$gallery_ids = array_filter( array_map( 'trim', explode( ',', (string) $value ) ) );
+													}
+												}
+												?>
+												<div class="profootball-gallery-editor">
+													<div class="profootball-gallery-preview">
+														<?php foreach ( $gallery_ids as $img_id ) :
+															$img_url = wp_get_attachment_image_url( (int) $img_id, 'thumbnail' );
+															if ( ! $img_url ) continue;
+															$img_alt = get_post_meta( (int) $img_id, '_wp_attachment_image_alt', true );
+														?>
+															<div class="profootball-gallery-item">
+																<img src="<?php echo esc_url( $img_url ); ?>" alt="<?php echo esc_attr( $img_alt ); ?>">
+																<button type="button" class="profootball-gallery-remove" aria-label="<?php esc_attr_e( 'Remove', 'profootball' ); ?>">&times;</button>
+																<input type="hidden" name="<?php echo esc_attr( $mapping ); ?>_keep[]" value="<?php echo esc_attr( $img_id ); ?>">
+															</div>
+														<?php endforeach; ?>
+													</div>
+													<label class="profootball-upload-label profootball-gallery-add-label">
+														<span class="dashicons dashicons-plus-alt"></span>
+														<span><?php esc_html_e( 'Add Images', 'profootball' ); ?></span>
+														<input type="file" name="<?php echo esc_attr( $mapping ); ?>_new[]" multiple accept="image/*" class="profootball-hidden-input">
+													</label>
+												</div>
 											
 											<?php else : ?>
 												<input type="text" name="<?php echo esc_attr( $mapping ); ?>" value="<?php echo esc_attr( $value ); ?>" style="width:100%;">
@@ -388,5 +421,52 @@ if ( empty( $sections ) ) {
 }
 .current-file a:hover {
 	text-decoration: underline;
+}
+.profootball-gallery-editor {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+.profootball-gallery-preview {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+.profootball-gallery-item {
+	position: relative;
+	display: inline-block;
+}
+.profootball-gallery-item img {
+	width: 80px;
+	height: 80px;
+	object-fit: cover;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	display: block;
+}
+.profootball-gallery-remove {
+	position: absolute;
+	top: -6px;
+	right: -6px;
+	background: #d63638;
+	color: #fff;
+	border: none;
+	border-radius: 50%;
+	width: 20px;
+	height: 20px;
+	line-height: 18px;
+	text-align: center;
+	cursor: pointer;
+	font-size: 14px;
+	padding: 0;
+}
+.profootball-gallery-add-label {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	cursor: pointer;
+}
+.profootball-hidden-input {
+	display: none;
 }
 </style>
