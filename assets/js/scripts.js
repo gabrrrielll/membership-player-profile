@@ -1,5 +1,10 @@
 jQuery(document).ready(function ($) {
 
+    // Gallery editor: remove image
+    $(document).on('click', '.profootball-gallery-remove', function () {
+        $(this).closest('.profootball-gallery-item').remove();
+    });
+
     // Smooth scroll for anchor buttons
     $('.profootball-anchor-button').on('click', function (e) {
         var target = $(this).attr('href');

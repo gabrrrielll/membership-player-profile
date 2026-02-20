@@ -165,12 +165,41 @@ class ProFootball_Player_Profile {
 						// Preserve existing value if no new file uploaded
 						$value = get_user_meta( $user_id, $mapping, true );
 					}
+				} elseif ( $field['type'] === 'gallery' ) {
+					// Keep existing images not removed by the user
+					$keep_ids = isset( $_POST[ $mapping . '_keep' ] ) ? array_map( 'intval', (array) $_POST[ $mapping . '_keep' ] ) : array();
+
+					// Upload newly added images
+					$new_ids    = array();
+					$upload_key = $mapping . '_new';
+					if ( ! empty( $_FILES[ $upload_key ]['name'][0] ) ) {
+						$files      = $_FILES[ $upload_key ];
+						$file_count = count( $files['name'] );
+						for ( $fi = 0; $fi < $file_count; $fi++ ) {
+							if ( empty( $files['name'][ $fi ] ) ) continue;
+							$_FILES['profootball_gallery_tmp'] = array(
+								'name'     => $files['name'][ $fi ],
+								'type'     => $files['type'][ $fi ],
+								'tmp_name' => $files['tmp_name'][ $fi ],
+								'error'    => $files['error'][ $fi ],
+								'size'     => $files['size'][ $fi ],
+							);
+							$attachment_id = media_handle_upload( 'profootball_gallery_tmp', 0 );
+							if ( ! is_wp_error( $attachment_id ) ) {
+								$new_ids[] = $attachment_id;
+							}
+						}
+					}
+
+					$all_ids = array_values( array_unique( array_filter( array_merge( $keep_ids, $new_ids ) ) ) );
+					$value   = wp_json_encode( $all_ids );
+					update_user_meta( $user_id, $mapping, $value );
 				} else {
 					$value = isset( $_POST[ $mapping ] ) ? $_POST[ $mapping ] : '';
 					
 					// 1. Sync to User Meta (UMP)
 					$value = wp_unslash($value);
-					if ( $field['type'] === 'gallery' || $field['type'] === 'video' ) {
+					if ( $field['type'] === 'video' ) {
 						update_user_meta( $user_id, $mapping, sanitize_text_field( $value ) );
 					} else {
 						$clean_value = is_array($value) ? array_map('sanitize_text_field', $value) : wp_kses_post( $value );
