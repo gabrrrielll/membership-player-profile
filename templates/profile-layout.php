@@ -40,6 +40,15 @@ if ( is_user_logged_in() ) {
 
 // If no sections defined, show a basic message or standard SP data
 ?>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.body.classList.add('profootball-custom-profile-active');
+    });
+    // In case DOMContentLoaded already fired
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        document.body.classList.add('profootball-custom-profile-active');
+    }
+</script>
 <div class="profootball-profile-container">
     
     <!-- Navigation Buttons will now be handled as a positionable field from admin -->
