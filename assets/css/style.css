@@ -330,3 +330,28 @@
         display: block;
     }
 }
+
+/* ========================================================
+   HIDE SPORTSPRESS DEFAULT ELEMENTS FOR CUSTOM PROFILES
+   (This file is only loaded when sync/premium is active,
+    so this safely isolates the premium profiles)
+   ======================================================== */
+body.single-sp_player .sp-template,
+body.single-sp_player .sp-post-thumbnail,
+body.single-sp_player .sp-player-dropdown,
+body.single-sp_player .entry-header {
+    display: none !important;
+}
+
+body.single-sp_player article.sp_player>*:not(.post-content):not(.entry-content):not(.profootball-profile-container) {
+    display: none !important;
+}
+
+body.single-sp_player .entry-content>*:not(.profootball-profile-container),
+body.single-sp_player .post-content>*:not(.profootball-profile-container) {
+    display: none !important;
+}
+
+body.single-sp_player .profootball-profile-container {
+    display: block !important;
+}

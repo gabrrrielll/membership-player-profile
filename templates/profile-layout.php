@@ -109,7 +109,7 @@ if ( is_user_logged_in() ) {
     </div>
 
     <!-- Render Dynamic Sections -->
-    <div class="profootball-content">
+    <div class="profootball-content profootball-custom-fields-section">
         <?php if ( ! empty( $sections ) ) : ?>
             <?php foreach ( $sections as $index => $section ) : 
                 $safe_id = 'section-' . sanitize_title( $section['title'] );
