@@ -37,7 +37,7 @@ class ProFootball_Player_Profile {
 		add_shortcode( 'profootball_player_profile', array( $this, 'render_player_profile' ) );
 		
 		// Intercept SportsPress layout completely for new premium players
-		add_action( 'sportspress_before_single_player', array( $this, 'override_sportspress_player_layout' ), 1 );
+		add_filter( 'the_content', array( $this, 'override_player_content' ), 99 );
 
 		// Plugin Action Links
 		add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'add_settings_link' ) );
@@ -343,24 +343,22 @@ class ProFootball_Player_Profile {
 	}
 
 	/**
-	 * Intercept the SportsPress player template for premium profiles
+	 * Override the content of the sp_player post type if it's a single page.
+	 * Runs at priority 99 (after SportsPress priority 20) to completely replace the content
+	 * for NEW premium players, while leaving the SportsPress generated layout for OLD players.
 	 */
-	public function override_sportspress_player_layout() {
-		if ( is_singular( 'sp_player' ) ) {
+	public function override_player_content( $content ) {
+		if ( is_singular( 'sp_player' ) && in_the_loop() && is_main_query() ) {
 			$player_id = get_the_ID();
 			$user_id = get_post_meta( $player_id, '_sp_user_id', true );
 			
 			if ( $this->is_player_sync_allowed( $user_id ) ) {
-				// Remove all standard SportsPress layout blocks
-				remove_all_actions( 'sportspress_single_player' );
-				// Add our custom player output instead
-				add_action( 'sportspress_single_player', array( $this, 'render_custom_player_layout' ), 10 );
+				// Discard SportsPress generated content completely for premium players
+				// and output our own layout directly.
+				return $this->render_player_profile( array( 'id' => $player_id ) );
 			}
 		}
-	}
-
-	public function render_custom_player_layout() {
-		echo $this->render_player_profile( array( 'id' => get_the_ID() ) );
+		return $content;
 	}
 
 	/**
