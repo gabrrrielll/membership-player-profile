@@ -36,8 +36,8 @@ class ProFootball_Player_Profile {
 		// Custom Shortcode for Player Profile
 		add_shortcode( 'profootball_player_profile', array( $this, 'render_player_profile' ) );
 		
-		// Filter SportsPress Player Page
-		add_filter( 'the_content', array( $this, 'override_player_content' ) );
+		// Intercept SportsPress layout completely for new premium players
+		add_action( 'sportspress_before_single_player', array( $this, 'override_sportspress_player_layout' ), 1 );
 
 		// Plugin Action Links
 		add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'add_settings_link' ) );
@@ -343,26 +343,32 @@ class ProFootball_Player_Profile {
 	}
 
 	/**
-	 * Override the content of the sp_player post type if it's a single page
+	 * Intercept the SportsPress player template for premium profiles
 	 */
-	public function override_player_content( $content ) {
-		if ( is_singular( 'sp_player' ) && in_the_loop() && is_main_query() ) {
+	public function override_sportspress_player_layout() {
+		if ( is_singular( 'sp_player' ) ) {
 			$player_id = get_the_ID();
 			$user_id = get_post_meta( $player_id, '_sp_user_id', true );
 			
 			if ( $this->is_player_sync_allowed( $user_id ) ) {
-				return $this->render_player_profile( array( 'id' => $player_id ) );
+				// Remove all standard SportsPress layout blocks
+				remove_all_actions( 'sportspress_single_player' );
+				// Add our custom player output instead
+				add_action( 'sportspress_single_player', array( $this, 'render_custom_player_layout' ), 10 );
 			}
 		}
-		return $content;
+	}
+
+	public function render_custom_player_layout() {
+		echo $this->render_player_profile( array( 'id' => get_the_ID() ) );
 	}
 
 	/**
 	 * Check if a user/player is allowed to use the premium integration based on membership
 	 */
 	public function is_player_sync_allowed( $user_id ) {
-		if ( current_user_can( 'manage_options' ) ) return true;
 		if ( ! $user_id ) return false;
+		if ( current_user_can( 'manage_options' ) ) return true;
 
 		$sync_memberships = get_option( 'profootball_sync_memberships', array() );
 		if ( empty( $sync_memberships ) ) return false;
