@@ -28,6 +28,7 @@ class ProFootball_Player_Profile {
 		// Enqueue Inline Styles & Scripts
 		add_action( 'wp_head', array( $this, 'inline_frontend_css' ) );
 		add_action( 'wp_footer', array( $this, 'inline_frontend_js' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_frontend_assets' ) );
 
 		// Hook after UMP registration or subscription activation
 		add_action( 'ihc_action_after_register_process', array( $this, 'link_member_to_player' ), 10, 1 );
@@ -339,6 +340,16 @@ class ProFootball_Player_Profile {
 		$js_path = PROFOOTBALL_PLAYER_PROFILE_PATH . 'assets/js/scripts.js';
 		if ( file_exists( $js_path ) ) {
 			echo '<script type="text/javascript">' . file_get_contents( $js_path ) . '</script>';
+		}
+	}
+
+	/**
+	 * Enqueue standard WordPress assets
+	 */
+	public function enqueue_frontend_assets() {
+		$account_page_id = get_option( 'ihc_general_user_page' );
+		if ( is_page( $account_page_id ) || is_singular( 'sp_player' ) ) {
+			wp_enqueue_style( 'dashicons' );
 		}
 	}
 

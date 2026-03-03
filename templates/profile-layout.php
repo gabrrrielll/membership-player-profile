@@ -344,7 +344,20 @@ function render_profootball_public_field( $field, $value ) {
             }
             break;
         case 'gallery':
-            $ids = is_array( $value ) ? $value : explode( ',', $value );
+            $ids = array();
+            if ( is_array( $value ) ) {
+                $ids = $value;
+            } elseif ( is_string( $value ) && ! empty( $value ) ) {
+                // Try JSON decode first
+                $decoded = json_decode( $value, true );
+                if ( is_array( $decoded ) ) {
+                    $ids = $decoded;
+                } else {
+                    // Fallback to comma separated
+                    $ids = explode( ',', $value );
+                }
+            }
+            $ids = array_filter( array_map( 'trim', $ids ) );
             ?>
             <div class="profootball-gallery-slider">
                 <div class="slider-wrapper">
