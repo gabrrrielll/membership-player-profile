@@ -7,6 +7,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 $user_id = isset( $user_id ) ? $user_id : get_current_user_id();
+$preview_url = isset( $preview_url ) ? $preview_url : '';
+if ( $preview_url === '' && isset( $this ) && $this instanceof ProFootball_Player_Profile ) {
+	$preview_url = $this->get_player_profile_url( $user_id );
+}
 $sections = get_option( 'profootball_player_sections', array() );
 $ump_fields = array();
 if ( function_exists( 'ihc_get_user_reg_fields' ) ) {
@@ -92,6 +96,20 @@ if ( ! function_exists( 'profootball_get_field_options' ) ) {
 	}
 }
 
+if ( ! function_exists( 'profootball_render_preview_page_button' ) ) {
+	function profootball_render_preview_page_button( $url ) {
+		if ( empty( $url ) ) {
+			return;
+		}
+		?>
+		<a href="<?php echo esc_url( $url ); ?>" class="profootball-preview-page-btn" target="_blank" rel="noopener noreferrer" title="<?php esc_attr_e( 'Opens your public profile in a new tab', 'profootball' ); ?>">
+			<span class="dashicons dashicons-visibility" aria-hidden="true"></span>
+			<?php esc_html_e( 'Preview Page', 'profootball' ); ?>
+		</a>
+		<?php
+	}
+}
+
 if ( ! function_exists( 'profootball_get_countries' ) ) {
 	function profootball_get_countries() {
 		return array(
@@ -155,8 +173,13 @@ if ( empty( $sections ) ) {
 ?>
 
 <div class="profootball-account-form-wrap">
-	<h3>Edit Player Details</h3>
-	<p>Complete the information below to update your public player profile.</p>
+	<div class="profootball-form-header">
+		<div class="profootball-form-header-text">
+			<h3>Edit Player Details</h3>
+			<p>Complete the information below to update your public player profile.</p>
+		</div>
+		<?php profootball_render_preview_page_button( $preview_url ); ?>
+	</div>
 
 	<?php if ( isset( $_GET['profootball_save'] ) && $_GET['profootball_save'] === 'success' ) : ?>
 		<div class="ihc-success-box">Your profile details have been updated successfully!</div>
@@ -340,12 +363,69 @@ if ( empty( $sections ) ) {
 		<?php endforeach; ?>
 
 		<div class="profootball-form-submit">
+			<?php profootball_render_preview_page_button( $preview_url ); ?>
 			<button type="submit" name="profootball_save_profile" class="ihc-submit-bttn">Save All Details</button>
 		</div>
 	</form>
 </div>
 
 <style>
+.profootball-form-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	margin-bottom: 20px;
+	flex-wrap: wrap;
+}
+.profootball-form-header-text {
+	flex: 1 1 220px;
+}
+.profootball-form-header-text h3 {
+	margin: 0 0 6px;
+}
+.profootball-form-header-text p {
+	margin: 0;
+}
+.profootball-account-form-wrap .profootball-preview-page-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	padding: 10px 18px;
+	border: 2px solid #d4af37;
+	background: #fff;
+	color: #111 !important;
+	font-weight: 700;
+	text-decoration: none !important;
+	border-radius: 4px;
+	white-space: nowrap;
+	line-height: 1.2;
+	box-sizing: border-box;
+	flex-shrink: 0;
+	transition: background 0.2s ease, color 0.2s ease;
+}
+.profootball-account-form-wrap .profootball-preview-page-btn:hover,
+.profootball-account-form-wrap .profootball-preview-page-btn:focus {
+	background: #d4af37;
+	color: #000 !important;
+	text-decoration: none !important;
+}
+.profootball-account-form-wrap .profootball-preview-page-btn .dashicons {
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+	line-height: 18px;
+}
+@media (max-width: 600px) {
+	.profootball-form-header .profootball-preview-page-btn,
+	.profootball-form-submit .profootball-preview-page-btn,
+	.profootball-form-submit .ihc-submit-bttn {
+		width: 100%;
+		justify-content: center;
+		text-align: center;
+	}
+}
 .profootball-form-section {
 	background: #f9f9f9;
 	padding: 20px;
@@ -383,6 +463,10 @@ if ( empty( $sections ) ) {
 }
 .profootball-form-submit {
 	margin-top: 20px;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	flex-wrap: wrap;
 }
 .profootball-form-field select[multiple] {
 	height: auto;

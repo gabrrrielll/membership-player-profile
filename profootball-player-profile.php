@@ -102,8 +102,12 @@ class ProFootball_Player_Profile {
 	 */
 	public function add_ump_account_tab_content( $content, $tab ) {
 		if ( $tab === 'player_details' ) {
+			$user_id = get_current_user_id();
 			ob_start();
-			$this->get_template( 'account-player-form.php', array( 'user_id' => get_current_user_id() ) );
+			$this->get_template( 'account-player-form.php', array(
+				'user_id'     => $user_id,
+				'preview_url' => $this->get_player_profile_url( $user_id ),
+			) );
 			return ob_get_clean();
 		}
 		return $content;
@@ -243,7 +247,7 @@ class ProFootball_Player_Profile {
 		exit;
 	}
 
-	private function get_player_id_by_user( $user_id ) {
+	public function get_player_id_by_user( $user_id ) {
 		$posts = get_posts( array(
 			'post_type'  => 'sp_player',
 			'meta_key'   => '_sp_user_id',
@@ -252,6 +256,18 @@ class ProFootball_Player_Profile {
 			'fields'     => 'ids'
 		) );
 		return ! empty( $posts ) ? $posts[0] : false;
+	}
+
+	/**
+	 * Public URL of the linked SportsPress player profile, if one exists.
+	 */
+	public function get_player_profile_url( $user_id ) {
+		$player_id = $this->get_player_id_by_user( $user_id );
+		if ( ! $player_id ) {
+			return '';
+		}
+		$url = get_permalink( $player_id );
+		return $url ? $url : '';
 	}
 
 	/**
