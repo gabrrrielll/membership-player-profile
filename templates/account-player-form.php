@@ -8,8 +8,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $user_id = isset( $user_id ) ? $user_id : get_current_user_id();
 $preview_url = isset( $preview_url ) ? $preview_url : '';
-if ( $preview_url === '' && isset( $this ) && $this instanceof ProFootball_Player_Profile ) {
-	$preview_url = $this->get_player_profile_url( $user_id );
+$player_needs_publish = ! empty( $player_needs_publish );
+if ( isset( $this ) && $this instanceof ProFootball_Player_Profile ) {
+	if ( $preview_url === '' ) {
+		$preview_url = $this->get_player_profile_url( $user_id );
+	}
+	if ( ! $player_needs_publish ) {
+		$player_needs_publish = $this->player_needs_publish( $user_id );
+	}
 }
 $sections = get_option( 'profootball_player_sections', array() );
 $ump_fields = array();
@@ -183,6 +189,10 @@ if ( empty( $sections ) ) {
 
 	<?php if ( isset( $_GET['profootball_save'] ) && $_GET['profootball_save'] === 'success' ) : ?>
 		<div class="ihc-success-box">Your profile details have been updated successfully!</div>
+	<?php endif; ?>
+
+	<?php if ( $player_needs_publish ) : ?>
+		<div class="ihc-warning-box profootball-draft-notice">Your profile page is still a draft, so it is not public and Preview is hidden. Press Save All Details to publish it.</div>
 	<?php endif; ?>
 
 	<form method="post" action="" enctype="multipart/form-data">
@@ -370,6 +380,14 @@ if ( empty( $sections ) ) {
 </div>
 
 <style>
+.profootball-draft-notice {
+	background: #fff8e6;
+	border: 1px solid #d4af37;
+	color: #333;
+	padding: 12px 14px;
+	border-radius: 4px;
+	margin-bottom: 16px;
+}
 .profootball-form-header {
 	display: flex;
 	align-items: center;

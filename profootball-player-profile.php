@@ -37,8 +37,9 @@ class ProFootball_Player_Profile {
 		// Custom Shortcode for Player Profile
 		add_shortcode( 'profootball_player_profile', array( $this, 'render_player_profile' ) );
 		
-		// Intercept SportsPress layout completely for new premium players
+		// Always replace the SportsPress/theme player layout with this plugin's layout.
 		add_filter( 'the_content', array( $this, 'override_player_content' ), 99 );
+		add_filter( 'body_class', array( $this, 'add_player_body_class' ) );
 
 		// Plugin Action Links
 		add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'add_settings_link' ) );
@@ -105,8 +106,9 @@ class ProFootball_Player_Profile {
 			$user_id = get_current_user_id();
 			ob_start();
 			$this->get_template( 'account-player-form.php', array(
-				'user_id'     => $user_id,
-				'preview_url' => $this->get_player_profile_url( $user_id ),
+				'user_id'               => $user_id,
+				'preview_url'           => $this->get_player_profile_url( $user_id ),
+				'player_needs_publish'  => $this->player_needs_publish( $user_id ),
 			) );
 			return ob_get_clean();
 		}
@@ -141,6 +143,9 @@ class ProFootball_Player_Profile {
 		if ( ! $user_id ) return;
 
 		$player_id = $this->get_player_id_by_user( $user_id );
+		if ( ! $player_id ) {
+			$player_id = $this->create_player_for_user( $user_id );
+		}
 		$sections = get_option( 'profootball_player_sections', array() );
 		if ( empty( $sections ) ) return;
 
@@ -243,31 +248,162 @@ class ProFootball_Player_Profile {
 			update_post_meta( $player_id, 'sp_nationality', $nationality );
 		}
 
+		if ( $player_id ) {
+			$this->ensure_player_is_public( $player_id, $user_id );
+		}
+
 		wp_redirect( add_query_arg( 'profootball_save', 'success' ) );
 		exit;
 	}
 
 	public function get_player_id_by_user( $user_id ) {
-		$posts = get_posts( array(
-			'post_type'  => 'sp_player',
-			'meta_key'   => '_sp_user_id',
-			'meta_value' => $user_id,
-			'posts_per_page' => 1,
-			'fields'     => 'ids'
+		if ( ! $user_id ) {
+			return false;
+		}
+
+		$statuses = array( 'publish', 'draft', 'pending', 'private', 'future' );
+		$candidates = get_posts( array(
+			'post_type'      => 'sp_player',
+			'post_status'    => $statuses,
+			'posts_per_page' => 10,
+			'fields'         => 'ids',
+			'orderby'        => 'date',
+			'order'          => 'ASC',
+			'no_found_rows'  => true,
+			'meta_query'     => array(
+				'relation' => 'OR',
+				array(
+					'key'   => '_sp_user_id',
+					'value' => (string) $user_id,
+				),
+				array(
+					'key'   => 'sp_user',
+					'value' => (string) $user_id,
+				),
+			),
 		) );
-		return ! empty( $posts ) ? $posts[0] : false;
+
+		// SportsPress user registration creates a draft and only sets post_author.
+		if ( empty( $candidates ) && ! user_can( $user_id, 'edit_others_posts' ) ) {
+			$candidates = get_posts( array(
+				'post_type'      => 'sp_player',
+				'post_status'    => $statuses,
+				'author'         => $user_id,
+				'posts_per_page' => 10,
+				'fields'         => 'ids',
+				'orderby'        => 'date',
+				'order'          => 'ASC',
+				'no_found_rows'  => true,
+			) );
+		}
+
+		if ( empty( $candidates ) ) {
+			return false;
+		}
+
+		foreach ( $candidates as $candidate_id ) {
+			if ( get_post_status( $candidate_id ) === 'publish' ) {
+				return (int) $candidate_id;
+			}
+		}
+
+		return (int) $candidates[0];
 	}
 
 	/**
-	 * Public URL of the linked SportsPress player profile, if one exists.
+	 * Public URL of the linked SportsPress player profile, if it is published.
 	 */
 	public function get_player_profile_url( $user_id ) {
 		$player_id = $this->get_player_id_by_user( $user_id );
-		if ( ! $player_id ) {
+		if ( ! $player_id || get_post_status( $player_id ) !== 'publish' ) {
 			return '';
 		}
 		$url = get_permalink( $player_id );
 		return $url ? $url : '';
+	}
+
+	/**
+	 * True when a player post exists but visitors cannot see it yet.
+	 */
+	public function player_needs_publish( $user_id ) {
+		$player_id = $this->get_player_id_by_user( $user_id );
+		if ( ! $player_id ) {
+			return false;
+		}
+		return get_post_status( $player_id ) !== 'publish';
+	}
+
+	/**
+	 * Link the player post to the member and publish drafts created at registration.
+	 */
+	public function ensure_player_is_public( $player_id, $user_id ) {
+		if ( ! $player_id || ! $user_id ) {
+			return false;
+		}
+
+		update_post_meta( $player_id, '_sp_user_id', $user_id );
+		$linked_user = get_post_meta( $player_id, 'sp_user', true );
+		if ( $linked_user === '' || $linked_user === '0' ) {
+			update_post_meta( $player_id, 'sp_user', $user_id );
+		}
+
+		$status = get_post_status( $player_id );
+		if ( ! in_array( $status, array( 'draft', 'pending', 'auto-draft', 'future' ), true ) ) {
+			return (int) $player_id;
+		}
+
+		remove_action( 'save_post_sp_player', array( $this, 'sync_player_to_user_meta' ), 15 );
+		wp_update_post( array(
+			'ID'          => $player_id,
+			'post_status' => 'publish',
+		) );
+		add_action( 'save_post_sp_player', array( $this, 'sync_player_to_user_meta' ), 15, 3 );
+
+		if ( get_post_status( $player_id ) !== 'publish' ) {
+			global $wpdb;
+			$wpdb->update(
+				$wpdb->posts,
+				array( 'post_status' => 'publish' ),
+				array( 'ID' => $player_id ),
+				array( '%s' ),
+				array( '%d' )
+			);
+			clean_post_cache( $player_id );
+		}
+
+		return (int) $player_id;
+	}
+
+	/**
+	 * Create a published SportsPress player linked to this member.
+	 */
+	public function create_player_for_user( $user_id ) {
+		$user = get_userdata( $user_id );
+		if ( ! $user ) {
+			return false;
+		}
+
+		$title = $user->display_name ? $user->display_name : $user->user_login;
+		$player_id = wp_insert_post( array(
+			'post_title'  => $title,
+			'post_type'   => 'sp_player',
+			'post_status' => 'publish',
+			'post_author' => $user_id,
+		), true );
+
+		if ( is_wp_error( $player_id ) || ! $player_id ) {
+			return false;
+		}
+
+		update_post_meta( $player_id, '_sp_user_id', $user_id );
+		update_post_meta( $player_id, 'sp_user', $user_id );
+
+		$nationality = get_user_meta( $user_id, 'nationality', true );
+		if ( $nationality ) {
+			update_post_meta( $player_id, 'sp_nationality', $nationality );
+		}
+
+		return (int) $player_id;
 	}
 
 	/**
@@ -314,15 +450,27 @@ class ProFootball_Player_Profile {
 		add_action( 'save_post_sp_player', array( $this, 'sync_player_to_user_meta' ), 15, 3 );
 	}
 
-	public function inline_frontend_css() {
-		$account_page_id = get_option( 'ihc_general_user_page' );
-		$is_player = is_singular( 'sp_player' );
+	public function add_player_body_class( $classes ) {
+		if ( is_singular( 'sp_player' ) ) {
+			$classes[] = 'profootball-custom-profile-active';
+		}
+		return $classes;
+	}
 
-		if ( ! is_page( $account_page_id ) ) {
-			if ( ! $is_player ) return;
-			$player_id = get_the_ID();
-			$user_id = get_post_meta( $player_id, '_sp_user_id', true );
-			if ( ! $this->is_player_sync_allowed( $user_id ) ) return;
+	/**
+	 * Account page, or any public player page (including legacy SportsPress players).
+	 */
+	private function should_load_frontend_assets() {
+		if ( is_singular( 'sp_player' ) ) {
+			return true;
+		}
+		$account_page_id = get_option( 'ihc_general_user_page' );
+		return $account_page_id && is_page( $account_page_id );
+	}
+
+	public function inline_frontend_css() {
+		if ( ! $this->should_load_frontend_assets() ) {
+			return;
 		}
 
 		$css_path = PROFOOTBALL_PLAYER_PROFILE_PATH . 'assets/css/style.css';
@@ -343,14 +491,8 @@ class ProFootball_Player_Profile {
 	}
 
 	public function inline_frontend_js() {
-		$account_page_id = get_option( 'ihc_general_user_page' );
-		$is_player = is_singular( 'sp_player' );
-
-		if ( ! is_page( $account_page_id ) ) {
-			if ( ! $is_player ) return;
-			$player_id = get_the_ID();
-			$user_id = get_post_meta( $player_id, '_sp_user_id', true );
-			if ( ! $this->is_player_sync_allowed( $user_id ) ) return;
+		if ( ! $this->should_load_frontend_assets() ) {
+			return;
 		}
 
 		$js_path = PROFOOTBALL_PLAYER_PROFILE_PATH . 'assets/js/scripts.js';
@@ -363,27 +505,18 @@ class ProFootball_Player_Profile {
 	 * Enqueue standard WordPress assets
 	 */
 	public function enqueue_frontend_assets() {
-		$account_page_id = get_option( 'ihc_general_user_page' );
-		if ( is_page( $account_page_id ) || is_singular( 'sp_player' ) ) {
+		if ( $this->should_load_frontend_assets() ) {
 			wp_enqueue_style( 'dashicons' );
 		}
 	}
 
 	/**
-	 * Override the content of the sp_player post type if it's a single page.
-	 * Runs at priority 99 (after SportsPress priority 20) to completely replace the content
-	 * for NEW premium players, while leaving the SportsPress generated layout for OLD players.
+	 * Replace the single player page content for every player.
+	 * Runs at priority 99, after SportsPress injects its own layout.
 	 */
 	public function override_player_content( $content ) {
 		if ( is_singular( 'sp_player' ) && in_the_loop() && is_main_query() ) {
-			$player_id = get_the_ID();
-			$user_id = get_post_meta( $player_id, '_sp_user_id', true );
-			
-			if ( $this->is_player_sync_allowed( $user_id ) ) {
-				// Discard SportsPress generated content completely for premium players
-				// and output our own layout directly.
-				return $this->render_player_profile( array( 'id' => $player_id ) );
-			}
+			return $this->render_player_profile( array( 'id' => get_the_ID() ) );
 		}
 		return $content;
 	}
@@ -440,27 +573,14 @@ class ProFootball_Player_Profile {
 			if ( ! in_array( $lid, $sync_memberships ) ) return;
 		}
 
-		// Check if player already exists
+		// Publish an existing draft instead of creating a second player.
 		$player_id = $this->get_player_id_by_user( $user_id );
-		if ( $player_id ) return;
-
-		// Create a new Player post
-		$player_id = wp_insert_post( array(
-			'post_title'   => $user->display_name,
-			'post_type'    => 'sp_player',
-			'post_status'  => 'publish',
-			'post_author'  => $user_id,
-		) );
-
-		if ( ! is_wp_error( $player_id ) ) {
-			update_post_meta( $player_id, '_sp_user_id', $user_id );
-			
-			// Optional: mapping standard SP nationality if UMP field exists
-			$nationality = get_user_meta( $user_id, 'nationality', true );
-			if ( $nationality ) {
-				update_post_meta( $player_id, 'sp_nationality', $nationality );
-			}
+		if ( $player_id ) {
+			$this->ensure_player_is_public( $player_id, $user_id );
+			return;
 		}
+
+		$this->create_player_for_user( $user_id );
 	}
 
 	/**

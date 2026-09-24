@@ -74,6 +74,9 @@ if ( is_user_logged_in() ) {
                     <?php 
                     // Squad Number (Standard SP)
                     $number = get_post_meta( $player_id, 'sp_number', true );
+                    if ( $number === '' || $number === null ) {
+                        $number = get_post_meta( $player_id, '_sp_number', true );
+                    }
                     if ( $number ) : ?>
                         <span class="squad-number">#<?php echo esc_html( $number ); ?></span>
                     <?php endif; ?>
@@ -163,13 +166,9 @@ if ( is_user_logged_in() ) {
                                     <div <?php echo $css_id ? 'id="'.esc_attr($css_id).'"' : ''; ?> class="profootball-grid-col col-<?php echo esc_attr($col_width); ?> profootball-field-item-group <?php echo esc_attr($css_class); ?>">
                                         <?php foreach ($sub_fields as $s_idx => $s_field) : ?>
                                             <?php 
-                                            // Fetch data
+                                            // Fetch data from the linked member, then from the SportsPress post.
                                             $abs_idx = $s_field['_abs_idx'];
-                                            $value = '';
-                                            if ( $user_id ) {
-                                                $mapping = ( new ProFootball_Player_Profile() )->get_field_mapping( $s_field, $index, $abs_idx );
-                                                $value = get_user_meta( $user_id, $mapping, true );
-                                            }
+                                            $value = profootball_resolve_public_value( $player_id, $user_id, $s_field, $index, $abs_idx );
 
                                             // Skip premium fields for non-premium users
                                             if ( ! $can_view_premium && in_array( $s_field['type'], array( 'file', 'gallery', 'video' ) ) ) {
@@ -218,6 +217,56 @@ if ( is_user_logged_in() ) {
 </div>
 
 <?php
+/**
+ * Member meta first, then the same value stored on the SportsPress player.
+ * Legacy players often have no linked user, but still have post data.
+ */
+function profootball_resolve_public_value( $player_id, $user_id, $field, $section_idx, $field_idx ) {
+	$mapping = ! empty( $field['mapping'] ) ? $field['mapping'] : '';
+	if ( $mapping === '' ) {
+		$label = ! empty( $field['label'] ) ? $field['label'] : '';
+		if ( $label ) {
+			$mapping = 'unmapped_field_' . sanitize_title( $label );
+		} else {
+			$mapping = 'unmapped_field_s' . $section_idx . '_f' . $field_idx;
+		}
+	}
+
+	$value = $user_id ? get_user_meta( $user_id, $mapping, true ) : '';
+	if ( $value !== '' && $value !== null && $value !== array() ) {
+		return $value;
+	}
+
+	if ( strpos( $mapping, 'tax_' ) === 0 ) {
+		$taxonomy = substr( $mapping, 4 );
+		if ( ! taxonomy_exists( $taxonomy ) ) {
+			return '';
+		}
+		$terms = wp_get_object_terms( $player_id, $taxonomy, array( 'fields' => 'ids' ) );
+		return is_wp_error( $terms ) ? '' : $terms;
+	}
+
+	if ( $mapping === '_thumbnail_id' ) {
+		return get_post_thumbnail_id( $player_id );
+	}
+
+	$meta_keys = array( $mapping );
+	if ( $mapping === '_sp_number' ) {
+		$meta_keys[] = 'sp_number';
+	} elseif ( $mapping === 'sp_number' ) {
+		$meta_keys[] = '_sp_number';
+	}
+
+	foreach ( $meta_keys as $meta_key ) {
+		$post_value = get_post_meta( $player_id, $meta_key, true );
+		if ( $post_value !== '' && $post_value !== null && $post_value !== array() ) {
+			return $post_value;
+		}
+	}
+
+	return '';
+}
+
 /**
  * Render field content based on type
  */
